@@ -24,3 +24,4 @@ jobs:
         with:
           folder: apps/example/dist
           branch: gh-pages
+          cname: piano.ejnkns.com
