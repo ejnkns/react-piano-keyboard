@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import "../theme.css";
 
-const resolveCSSVar = (name: string, fallback: string) =>
-  getComputedStyle(document.documentElement)
+const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
+  getComputedStyle(el)
     .getPropertyValue(name)
     .trim() || fallback;
 
@@ -24,13 +24,13 @@ export const WaveformVisualizer = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !analyserNode) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const bufferLength = analyserNode.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const bufferLength = analyserNode?.frequencyBinCount ?? 0;
+    const dataArray = bufferLength > 0 ? new Uint8Array(bufferLength) : null;
 
     const parent = canvas.parentElement;
     const resize = () => {
@@ -44,14 +44,12 @@ export const WaveformVisualizer = ({
     const ro = new ResizeObserver(resize);
     if (parent) ro.observe(parent);
 
-    // Cache computed styles to prevent layout thrashing (forced reflows) in requestAnimationFrame
-    let cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000");
-    let cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6");
+    let cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
+    let cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
 
-    // MutationObserver to update cached CSS variables when theme changes on the root element
     const observer = new MutationObserver(() => {
-      cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000");
-      cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6");
+      cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
+      cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -60,10 +58,8 @@ export const WaveformVisualizer = ({
 
     const draw = () => {
       animationRef.current = requestAnimationFrame(draw);
-      analyserNode.getByteTimeDomainData(dataArray);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.fillStyle = cachedBgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -71,23 +67,31 @@ export const WaveformVisualizer = ({
       ctx.strokeStyle = cachedStrokeColor;
       ctx.beginPath();
 
-      const sliceWidth = canvas.width / bufferLength;
-      let x = 0;
+      if (analyserNode && dataArray) {
+        analyserNode.getByteTimeDomainData(dataArray);
 
-      for (let i = 0; i < bufferLength; i++) {
-        const v = (dataArray[i] ?? 128) / 128;
-        const y = (v * canvas.height) / 2;
+        const sliceWidth = canvas.width / bufferLength;
+        let x = 0;
 
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+        for (let i = 0; i < bufferLength; i++) {
+          const v = (dataArray[i] ?? 128) / 128;
+          const y = (v * canvas.height) / 2;
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+
+          x += sliceWidth;
         }
 
-        x += sliceWidth;
+        ctx.lineTo(canvas.width, canvas.height / 2);
+      } else {
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
       }
 
-      ctx.lineTo(canvas.width, canvas.height / 2);
       ctx.stroke();
     };
 
@@ -105,11 +109,18 @@ export const WaveformVisualizer = ({
       style={{
         width: propWidth ? `${propWidth}px` : "100%",
         minWidth: 0,
+        maxHeight: height,
+        overflow: "hidden",
       }}
     >
       <canvas
         ref={canvasRef}
-        style={{ display: "block", width: "100%", borderRadius: "0.5rem" }}
+        style={{
+          display: "block",
+          width: "100%",
+          height,
+          borderRadius: "0.5rem",
+        }}
         height={height}
       />
     </div>

@@ -149,7 +149,11 @@ export const Piano = ({
       {...inputProps}
       ref={containerRef}
       tabIndex={0}
-      style={{ minWidth: "320px", outline: "none" }}
+      style={{
+        minWidth: "320px",
+        outline: "none",
+        ...(isOn ? {} : { "--piano-accent": "var(--piano-accent-off)" } as React.CSSProperties),
+      }}
       className={styles.case}
     >
       {(showControls || showWaveform) && (
@@ -172,74 +176,106 @@ export const Piano = ({
           )}
         </div>
       )}
-      <div className={styles.notesWell} style={{ position: "relative" }}>
-        {!isOn && (
+      <div className={styles.notesWell}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "4px 8px 0 0",
+            marginBottom: -4,
+            position: "relative",
+            zIndex: 5,
+          }}
+        >
           <div
+            onClick={isOn ? handlePowerOff : handlePowerOn}
             style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(15, 23, 42, 0.75)",
-              backdropFilter: "blur(6px)",
-              WebkitBackdropFilter: "blur(6px)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              zIndex: 10,
-              borderRadius: "0 0 14px 14px",
+              gap: 6,
+              cursor: "pointer",
+              userSelect: "none",
+              padding: "4px 8px",
+              borderRadius: 4,
+              background: isOn
+                ? "rgba(220, 38, 38, 0.15)"
+                : "transparent",
+              transition: "background 0.2s",
             }}
           >
-            <button
-              type="button"
-              onClick={handlePowerOn}
+            <span
               style={{
-                background: "var(--piano-accent, #3b82f6)",
-                color: "#fff",
-                border: "none",
-                borderRadius: "8px",
-                padding: "12px 24px",
-                fontSize: "14px",
-                fontWeight: "bold",
+                fontSize: 9,
                 fontFamily: "ui-monospace, monospace",
-                cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                textTransform: "uppercase",
+                fontWeight: 700,
                 letterSpacing: "0.05em",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 6px 16px rgba(59, 130, 246, 0.6)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.4)";
+                color: isOn
+                  ? "var(--piano-text-muted, #8a8a8a)"
+                  : "var(--piano-text-muted, #555)",
+                textTransform: "uppercase",
               }}
             >
-              Start Piano
-            </button>
+              Power
+            </span>
+            <div
+              style={{
+                position: "relative",
+                width: 36,
+                height: 18,
+                borderRadius: 9,
+                background: isOn
+                  ? "var(--piano-accent, #3b82f6)"
+                  : "#555",
+                transition: "background 0.3s",
+                boxShadow: isOn
+                  ? "inset 0 1px 3px rgba(0,0,0,0.3)"
+                  : "inset 0 1px 3px rgba(0,0,0,0.5)",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  left: isOn ? 18 : 2,
+                  width: 14,
+                  height: 14,
+                  borderRadius: "50%",
+                  background: isOn
+                    ? "#fff"
+                    : "#ccc",
+                  transition: "left 0.25s, background 0.25s",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
+                }}
+              />
+            </div>
           </div>
-        )}
-        {rowNotes ? (
-          <>
-            <PianoNotes
-              id="piano-top"
-              notes={rowNotes[1]}
-              whiteCount={maxWhiteCount}
-              {...shared}
-            />
-            <PianoNotes
-              id="piano-bottom"
-              notes={rowNotes[0]}
-              whiteCount={maxWhiteCount}
-              {...shared}
-            />
-          </>
-        ) : (
-          <PianoNotes id="piano" notes={notes} {...shared} />
-        )}
+        </div>
+        <div
+          style={{
+            opacity: isOn ? 1 : 0.4,
+            transition: "opacity 0.3s",
+            pointerEvents: isOn ? "auto" : "none",
+          }}
+        >
+          {rowNotes ? (
+            <>
+              <PianoNotes
+                id="piano-top"
+                notes={rowNotes[1]}
+                whiteCount={maxWhiteCount}
+                {...shared}
+              />
+              <PianoNotes
+                id="piano-bottom"
+                notes={rowNotes[0]}
+                whiteCount={maxWhiteCount}
+                {...shared}
+              />
+            </>
+          ) : (
+            <PianoNotes id="piano" notes={notes} {...shared} />
+          )}
+        </div>
       </div>
     </div>
   );

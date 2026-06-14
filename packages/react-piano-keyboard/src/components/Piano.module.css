@@ -96,7 +96,7 @@
 }
 
 .selected {
-  outline: 3px solid #3b82f6;
+  outline: 3px solid var(--piano-accent);
   outline-offset: -1px;
 }
 
