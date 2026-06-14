@@ -1,0 +1,2 @@
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const e=require("./constants.cjs"),i=["sine","sawtooth","square","triangle"],c=s=>typeof s=="string"&&i.includes(s),n=s=>typeof s=="string"&&e.PITCH_CLASSES.includes(s),r=s=>{if(typeof s!="string")return!1;const t=s.match(/^([A-G]#?)(\d+)$/);return t?e.PITCH_CLASSES.includes(t[1]):!1};exports.OSCILLATORS=i;exports.isOscillatorType=c;exports.isPitch=r;exports.isPitchClass=n;
+//# sourceMappingURL=types.cjs.map

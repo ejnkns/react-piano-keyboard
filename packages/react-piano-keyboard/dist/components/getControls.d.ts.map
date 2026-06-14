@@ -1,0 +1,1 @@
+{"version":3,"file":"getControls.d.ts","sourceRoot":"","sources":["../../src/components/getControls.tsx"],"names":[],"mappings":"AACA,OAAO,cAAc,CAAC;AACtB,OAAO,EAAE,aAAa,EAAE,MAAM,wBAAwB,CAAC;AACvD,OAAO,EAAE,UAAU,EAAgC,MAAM,UAAU,CAAC;AAyKpE,eAAO,MAAM,WAAW,GAAI,yBAGzB;IACD,GAAG,EAAE,aAAa,CAAC,KAAK,CAAC,CAAC;IAC1B,aAAa,CAAC,EAAE,OAAO,CAAC,UAAU,CAAC,CAAC;CACrC;;;;;;;;;CA2DA,CAAC"}
