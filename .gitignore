@@ -22,3 +22,6 @@ packages/**/dist/
 *.cjs
 *.mjs
 *.map
+
+*.md
+!README.md
