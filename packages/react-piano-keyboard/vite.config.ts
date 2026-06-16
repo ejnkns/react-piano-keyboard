@@ -7,9 +7,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: resolve(__dirname, "src/index.ts"),
-        hooks: resolve(__dirname, "src/hooks/index.ts"),
-        components: resolve(__dirname, "src/components/index.ts"),
+        index: resolve(__dirname, "src/react-piano-keyboard.ts"),
+        hooks: resolve(__dirname, "src/hooks.ts"),
+        components: resolve(__dirname, "src/components.ts"),
         types: resolve(__dirname, "src/types.ts"),
         constants: resolve(__dirname, "src/constants.ts"),
         pitches: resolve(__dirname, "src/pitches.ts"),

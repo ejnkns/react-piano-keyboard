@@ -1,2 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const T=440,E=57,A=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"],_=["C","D","E","F","G","A","B"],O=A.length,S=4,C=10,t=.2,I=.4,L=.5,n="sine";exports.A4=T;exports.A4_INDEX=E;exports.DEFAULT_OCTAVE=S;exports.DEFAULT_OSCILLATOR=n;exports.MAX_GAIN=L;exports.MAX_OCTAVE=C;exports.OCTAVE_LENGTH=O;exports.PITCH_CLASSES=A;exports.SMOOTH_IN_INTERVAL=t;exports.SMOOTH_OUT_INTERVAL=I;exports.WHITE_PITCH_CLASSES=_;
-//# sourceMappingURL=constants.cjs.map

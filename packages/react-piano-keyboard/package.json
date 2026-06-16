@@ -8,17 +8,17 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/react-piano-keyboard.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
     "./hooks": {
-      "types": "./dist/hooks/index.d.ts",
+      "types": "./dist/hooks.d.ts",
       "import": "./dist/hooks.mjs",
       "require": "./dist/hooks.cjs"
     },
     "./components": {
-      "types": "./dist/components/index.d.ts",
+      "types": "./dist/components.d.ts",
       "import": "./dist/components.mjs",
       "require": "./dist/components.cjs"
     },
