@@ -1,9 +1,116 @@
 import { useState } from "react";
 import "../../styles.css";
-import { UseMusicNotes } from "../../use-piano/use-music-notes";
-import { SetOptions, isOscillatorType, Oscillator } from "../../types";
+import { Audio, UseMusicNotes } from "../../use-piano/use-music-notes";
+import { isOscillatorType, Waveforms } from "../../constants";
 import { Knob } from "./knob";
-import { displayOscillators } from "./display-controls";
+
+export function getControls({
+  set,
+  defaultValues,
+}: {
+  set: UseMusicNotes["set"];
+  defaultValues?: Partial<Audio.SetOptions>;
+}) {
+  const handlers = getHandlers(set);
+
+  return {
+    knobs: [
+      {
+        name: "Gain",
+        control: () => (
+          <Knob
+            name="Gain"
+            defaultValue={defaultValues?.gain}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={handlers.gain}
+          />
+        ),
+      },
+      {
+        name: "Attack",
+        control: () => (
+          <Knob
+            name="Attack"
+            defaultValue={defaultValues?.attack}
+            min={0.01}
+            max={2}
+            step={0.01}
+            unit="s"
+            onChange={handlers.attack}
+          />
+        ),
+      },
+      {
+        name: "Decay",
+        control: () => (
+          <Knob
+            name="Decay"
+            defaultValue={defaultValues?.decay}
+            min={0.01}
+            max={2}
+            step={0.01}
+            unit="s"
+            onChange={handlers.decay}
+          />
+        ),
+      },
+    ],
+    buttonGroups: [
+      {
+        name: "Oscillator",
+        control: () => (
+          <WaveformPicker
+            defaultValue={defaultValues?.oscillator}
+            onChange={handlers.oscillator}
+          />
+        ),
+      },
+    ],
+  };
+}
+
+function getHandlers(set: UseMusicNotes["set"]) {
+  const handleSetOscillator = (value: string) => {
+    if (isOscillatorType(value)) set({ oscillator: value });
+  };
+
+  const handleSetAttack = (value: number) => {
+    set({ attack: value });
+  };
+
+  const handleSetDecay = (value: number) => {
+    set({ decay: value });
+  };
+
+  const handleSetGain = (value: number) => {
+    set({ gain: value });
+  };
+
+  return {
+    gain: handleSetGain,
+    oscillator: handleSetOscillator,
+    attack: handleSetAttack,
+    decay: handleSetDecay,
+  };
+}
+
+export type SelectOptions<T extends string> = {
+  id: number | string;
+  name: T;
+  icon?: string;
+};
+
+export const displayOscillators = [
+  { id: 1, name: "sine" as const },
+  { id: 2, name: "triangle" as const },
+  { id: 3, name: "sawtooth" as const },
+  { id: 4, name: "square" as const },
+] satisfies [
+  SelectOptions<"sine" | "triangle" | "sawtooth" | "square">,
+  ...SelectOptions<"sine" | "triangle" | "sawtooth" | "square">[],
+];
 
 const WAVEFORMS = displayOscillators.map((o) => o.name);
 
@@ -14,14 +121,14 @@ const WAVE_ICONS: Record<string, string> = {
   square: "M0,1 L3.5,1 L3.5,9 L7,9 L7,1 L10.5,1 L10.5,9 L14,9 L14,1",
 };
 
-const WaveformPicker = ({
+function WaveformPicker({
   defaultValue,
   onChange,
 }: {
   defaultValue?: string;
   onChange?: (value: string) => void;
-}) => {
-  const [selected, setSelected] = useState<Oscillator>(() =>
+}) {
+  const [selected, setSelected] = useState<Waveforms.Oscillator>(() =>
     isOscillatorType(defaultValue) ? defaultValue : "sine",
   );
 
@@ -143,96 +250,4 @@ const WaveformPicker = ({
       </div>
     </>
   );
-};
-
-const getHandlers = (set: UseMusicNotes["set"]) => {
-  const handleSetOscillator = (value: string) => {
-    if (isOscillatorType(value)) set({ oscillator: value });
-  };
-
-  const handleSetAttack = (value: number) => {
-    set({ attack: value });
-  };
-
-  const handleSetDecay = (value: number) => {
-    set({ decay: value });
-  };
-
-  const handleSetGain = (value: number) => {
-    set({ gain: value });
-  };
-
-  return {
-    gain: handleSetGain,
-    oscillator: handleSetOscillator,
-    attack: handleSetAttack,
-    decay: handleSetDecay,
-  };
-};
-
-export const getControls = ({
-  set,
-  defaultValues,
-}: {
-  set: UseMusicNotes["set"];
-  defaultValues?: Partial<SetOptions>;
-}) => {
-  const handlers = getHandlers(set);
-
-  return {
-    knobs: [
-      {
-        name: "Gain",
-        control: () => (
-          <Knob
-            name="Gain"
-            defaultValue={defaultValues?.gain}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={handlers.gain}
-          />
-        ),
-      },
-      {
-        name: "Attack",
-        control: () => (
-          <Knob
-            name="Attack"
-            defaultValue={defaultValues?.attack}
-            min={0.01}
-            max={2}
-            step={0.01}
-            unit="s"
-            onChange={handlers.attack}
-          />
-        ),
-      },
-      {
-        name: "Decay",
-        control: () => (
-          <Knob
-            name="Decay"
-            defaultValue={defaultValues?.decay}
-            min={0.01}
-            max={2}
-            step={0.01}
-            unit="s"
-            onChange={handlers.decay}
-          />
-        ),
-      },
-    ],
-    buttonGroups: [
-      {
-        name: "Oscillator",
-        control: () => (
-          <WaveformPicker
-            defaultValue={defaultValues?.oscillator}
-            onChange={handlers.oscillator}
-          />
-        ),
-      },
-    ],
-  };
-};
+}

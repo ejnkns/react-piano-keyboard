@@ -2,7 +2,10 @@
   "name": "react-piano-keyboard",
   "private": true,
   "type": "module",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "concurrently -n lib,example -c blue,green \"npm run dev -w packages/react-piano-keyboard\" \"npm run dev -w apps/example\"",
     "build": "npm run build -w packages/react-piano-keyboard && npm run build -w apps/example",
@@ -10,6 +13,7 @@
     "test": "npm run test -w packages/react-piano-keyboard"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "prettier": "3.8.4"
   }
 }

@@ -6,8 +6,7 @@ import {
   mapNotesToRow,
 } from "./piano-utils";
 import { OctaveRows } from "../keyboard-layout";
-import { getPitchRange, pitchToIndex, indexToPitch } from "../pitches";
-import { Pitch } from "../types";
+import { getPitchRange } from "../pitches";
 
 describe("getPitchRangeForWhiteKeyCount", () => {
   it("returns empty array for zero white keys", () => {
@@ -53,8 +52,15 @@ describe("getPitchRangeForWhiteKeyCount", () => {
 
 describe("mapNotesToRow", () => {
   it("maps bottom row C3-F4 starting at white index 0", () => {
-    const notes = getPitchRangeForWhiteKeyCount("C3", OctaveRows.bottom.whiteKeys.length);
-    const map = mapNotesToRow(notes, OctaveRows.bottom.whiteKeys, OctaveRows.bottom.blackKeys);
+    const notes = getPitchRangeForWhiteKeyCount(
+      "C3",
+      OctaveRows.bottom.whiteKeys.length,
+    );
+    const map = mapNotesToRow(
+      notes,
+      OctaveRows.bottom.whiteKeys,
+      OctaveRows.bottom.blackKeys,
+    );
 
     // first 7 white keys C3-B3
     expect(map["z"]).toBe("C3");
@@ -82,8 +88,15 @@ describe("mapNotesToRow", () => {
   });
 
   it("maps top row D4-G5 first white key to w", () => {
-    const notes = getPitchRangeForWhiteKeyCount("D4", OctaveRows.top.whiteKeys.length);
-    const map = mapNotesToRow(notes, OctaveRows.top.whiteKeys, OctaveRows.top.blackKeys);
+    const notes = getPitchRangeForWhiteKeyCount(
+      "D4",
+      OctaveRows.top.whiteKeys.length,
+    );
+    const map = mapNotesToRow(
+      notes,
+      OctaveRows.top.whiteKeys,
+      OctaveRows.top.blackKeys,
+    );
 
     // first white key D4 → w (not e)
     expect(map["w"]).toBe("D4");
@@ -98,8 +111,15 @@ describe("mapNotesToRow", () => {
   });
 
   it("top row starting at C4 maps first white to w and first black to 3", () => {
-    const notes = getPitchRangeForWhiteKeyCount("C4", OctaveRows.top.whiteKeys.length);
-    const map = mapNotesToRow(notes, OctaveRows.top.whiteKeys, OctaveRows.top.blackKeys);
+    const notes = getPitchRangeForWhiteKeyCount(
+      "C4",
+      OctaveRows.top.whiteKeys.length,
+    );
+    const map = mapNotesToRow(
+      notes,
+      OctaveRows.top.whiteKeys,
+      OctaveRows.top.blackKeys,
+    );
 
     expect(map["w"]).toBe("C4");
     expect(map["3"]).toBe("C#4");
@@ -221,8 +241,14 @@ describe("getTwoRowKeyToNoteMap", () => {
   });
 
   it("bottom C3 top D4 — top row first note D4 maps to w not e", () => {
-    const bottom = getPitchRangeForWhiteKeyCount("C3", OctaveRows.bottom.whiteKeys.length);
-    const top = getPitchRangeForWhiteKeyCount("D4", OctaveRows.top.whiteKeys.length);
+    const bottom = getPitchRangeForWhiteKeyCount(
+      "C3",
+      OctaveRows.bottom.whiteKeys.length,
+    );
+    const top = getPitchRangeForWhiteKeyCount(
+      "D4",
+      OctaveRows.top.whiteKeys.length,
+    );
     const map = getTwoRowKeyToNoteMap(bottom, top);
 
     // top row: D4 is first white key → w (regression: was e)

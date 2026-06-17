@@ -7,13 +7,13 @@ import {
   OctaveRows,
 } from "../keyboard-layout";
 import { pitchToIndex, indexToPitch } from "../pitches";
-import { Pitch } from "../types";
+import { Pitches } from "../pitches";
 
 export const getPitchRangeForWhiteKeyCount = (
-  start: Pitch,
+  start: Pitches.Pitch,
   whiteKeyCount: number,
-): Pitch[] => {
-  const result: Pitch[] = [];
+): Pitches.Pitch[] => {
+  const result: Pitches.Pitch[] = [];
   const startIdx = pitchToIndex(start);
   let whiteSeen = 0;
   let i = 0;
@@ -31,53 +31,57 @@ export const getPitchRangeForWhiteKeyCount = (
   return result;
 };
 
-const isWhite = (note: Pitch) => !note.includes("#");
+const isWhite = (note: Pitches.Pitch) => !note.includes("#");
 
-export const getKeyToNoteMap = (keys: Pitch[]) => {
+export const getKeyToNoteMap = (keys: Pitches.Pitch[]) => {
   if (!keys[0]) return {};
 
   const isTwoRows =
-    keys.length <= TwoKeyboardRowWhiteKeys.length + TwoKeyboardRowBlackKeys.length;
+    keys.length <=
+    TwoKeyboardRowWhiteKeys.length + TwoKeyboardRowBlackKeys.length;
 
   let whiteIndex = 0;
   const firstNoteIsWhite = isWhite(keys[0]);
   let blackIndex = firstNoteIsWhite ? 1 : 0;
 
-  return keys.reduce((acc, key, index) => {
-    const prevKey = index > 0 ? keys[index - 1] : undefined;
-    const prevWasWhite = prevKey && isWhite(prevKey);
-    if (isWhite(key)) {
-      const whiteKey = isTwoRows
-        ? TwoKeyboardRowWhiteKeys[whiteIndex]
-        : FourKeyboardRowWhiteKeys[whiteIndex];
-      if (whiteKey) {
-        acc[whiteKey] = key;
-        whiteIndex++;
+  return keys.reduce(
+    (acc, key, index) => {
+      const prevKey = index > 0 ? keys[index - 1] : undefined;
+      const prevWasWhite = prevKey && isWhite(prevKey);
+      if (isWhite(key)) {
+        const whiteKey = isTwoRows
+          ? TwoKeyboardRowWhiteKeys[whiteIndex]
+          : FourKeyboardRowWhiteKeys[whiteIndex];
+        if (whiteKey) {
+          acc[whiteKey] = key;
+          whiteIndex++;
 
-        if (prevWasWhite) blackIndex++;
+          if (prevWasWhite) blackIndex++;
+        }
+      } else {
+        const blackKey = isTwoRows
+          ? TwoKeyboardRowBlackKeys[blackIndex]
+          : FourKeyboardRowBlackKeys[
+              index >= FourKeyboardRowNotesLength ? blackIndex + 1 : blackIndex
+            ];
+        if (blackKey) {
+          acc[blackKey] = key;
+          blackIndex++;
+        }
       }
-    } else {
-      const blackKey = isTwoRows
-        ? TwoKeyboardRowBlackKeys[blackIndex]
-        : FourKeyboardRowBlackKeys[
-            index >= FourKeyboardRowNotesLength ? blackIndex + 1 : blackIndex
-          ];
-      if (blackKey) {
-        acc[blackKey] = key;
-        blackIndex++;
-      }
-    }
 
-    return acc;
-  }, {} as Record<string, Pitch>);
+      return acc;
+    },
+    {} as Record<string, Pitches.Pitch>,
+  );
 };
 
 export const mapNotesToRow = (
-  notes: Pitch[],
+  notes: Pitches.Pitch[],
   whiteKeys: readonly string[],
   blackKeys: readonly string[],
-): Record<string, Pitch> => {
-  const result: Record<string, Pitch> = {};
+): Record<string, Pitches.Pitch> => {
+  const result: Record<string, Pitches.Pitch> = {};
   let wi = 0;
 
   for (const note of notes) {
@@ -95,11 +99,19 @@ export const mapNotesToRow = (
 };
 
 export const getTwoRowKeyToNoteMap = (
-  bottomNotes: Pitch[],
-  topNotes: Pitch[],
-): Record<string, Pitch> => {
+  bottomNotes: Pitches.Pitch[],
+  topNotes: Pitches.Pitch[],
+): Record<string, Pitches.Pitch> => {
   return {
-    ...mapNotesToRow(bottomNotes, OctaveRows.bottom.whiteKeys, OctaveRows.bottom.blackKeys),
-    ...mapNotesToRow(topNotes, OctaveRows.top.whiteKeys, OctaveRows.top.blackKeys),
+    ...mapNotesToRow(
+      bottomNotes,
+      OctaveRows.bottom.whiteKeys,
+      OctaveRows.bottom.blackKeys,
+    ),
+    ...mapNotesToRow(
+      topNotes,
+      OctaveRows.top.whiteKeys,
+      OctaveRows.top.blackKeys,
+    ),
   };
 };

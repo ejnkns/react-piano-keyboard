@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
-import { UseMusicNotes } from "../use-piano/use-music-notes";
-import { SetOptions } from "../types";
+import { Audio, UseMusicNotes } from "../use-piano/use-music-notes";
 import { getControls } from "./controls/get-controls";
 
 export const Controls = ({
@@ -9,7 +8,7 @@ export const Controls = ({
   onClose,
 }: {
   set: UseMusicNotes["set"];
-  defaultValues?: Partial<SetOptions>;
+  defaultValues?: Partial<Audio.SetOptions>;
   onClose?: () => void;
 }) => {
   const { knobs, buttonGroups } = getControls({ set, defaultValues });

@@ -1,38 +1,42 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { usePiano } from "./use-piano";
-import { PianoNotes } from "./piano/notes";
+import { PianoNotes } from "./piano/piano-notes";
 import { Controls } from "./piano/controls";
 import { WaveformVisualizer } from "./piano/waveform-visualizer";
-import { Pitch, Oscillator, SetOptions } from "./types";
+import { Pitches } from "./pitches";
+import { Waveforms } from "./constants";
+import { Audio } from "./use-piano/use-music-notes";
 import styles from "./piano/piano.module.css";
 
-export type PianoProps = {
-  rows?: 1 | 2;
-  start?: Pitch | { bottom: Pitch; top?: Pitch };
-  end?: Pitch;
-  controls?:
-    | boolean
-    | {
-        onClose?: () => void;
-        defaultValues?: Partial<SetOptions>;
-      };
-  waveform?:
-    | boolean
-    | {
-        width?: number;
-        height?: number;
-        strokeColor?: string;
-        backgroundColor?: string;
-      };
-  audioContext?: AudioContext;
-  analyserNode?: AnalyserNode;
-  oscillator?: Oscillator;
-  gain?: number;
-  attack?: number;
-  decay?: number;
-};
+export namespace Piano {
+  export type Props = {
+    rows?: 1 | 2;
+    start?: Pitches.Pitch | { bottom: Pitches.Pitch; top?: Pitches.Pitch };
+    end?: Pitches.Pitch;
+    controls?:
+      | boolean
+      | {
+          onClose?: () => void;
+          defaultValues?: Partial<Audio.SetOptions>;
+        };
+    waveform?:
+      | boolean
+      | {
+          width?: number;
+          height?: number;
+          strokeColor?: string;
+          backgroundColor?: string;
+        };
+    audioContext?: AudioContext;
+    analyserNode?: AnalyserNode;
+    oscillator?: Waveforms.Oscillator;
+    gain?: number;
+    attack?: number;
+    decay?: number;
+  };
+}
 
-export const Piano = ({
+export function Piano({
   rows,
   start,
   end,
@@ -44,7 +48,7 @@ export const Piano = ({
   gain,
   attack,
   decay,
-}: PianoProps) => {
+}: Piano.Props) {
   const showControls = !!controlsProp;
   const showWaveform = !!waveformProp;
   const controlsOverrides =
@@ -279,4 +283,4 @@ export const Piano = ({
       </div>
     </div>
   );
-};
+}

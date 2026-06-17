@@ -1,5 +1,3 @@
-import { Oscillator } from "./types";
-
 export const A4 = 440.0;
 export const A4_INDEX = 57;
 export const PITCH_CLASSES = [
@@ -24,4 +22,19 @@ export const MAX_OCTAVE = 10;
 export const SMOOTH_IN_INTERVAL = 0.2;
 export const SMOOTH_OUT_INTERVAL = 0.4;
 export const MAX_GAIN = 0.5;
-export const DEFAULT_OSCILLATOR = "sine" satisfies Oscillator;
+
+export const OSCILLATORS = [
+  "sine",
+  "sawtooth",
+  "square",
+  "triangle",
+] satisfies OscillatorType[];
+
+export namespace Waveforms {
+  export type Oscillator = (typeof OSCILLATORS)[number];
+}
+
+export const isOscillatorType = (value: unknown): value is Waveforms.Oscillator =>
+  typeof value === "string" && OSCILLATORS.includes(value as Waveforms.Oscillator);
+
+export const DEFAULT_OSCILLATOR = "sine" satisfies Waveforms.Oscillator;

@@ -1,27 +1,26 @@
-import { getPitchClass } from "../pitches";
-import { Pitch } from "../types";
+import { getPitchClass, Pitches } from "../pitches";
 import styles from "./piano.module.css";
 import { useMouseAndTouchDown } from "./notes/use-mouse-down";
 import { NO_MARGIN_NOTES } from "../keyboard-layout";
 
 type AudioProps = {
-  start: (note: Pitch) => void;
-  stop: (note: Pitch) => void;
-  playingNotes?: Pitch[];
+  start: (note: Pitches.Pitch) => void;
+  stop: (note: Pitches.Pitch) => void;
+  playingNotes?: Pitches.Pitch[];
 };
 
 type MappingProps = {
-  keyNoteMap: Record<string, Pitch>;
-  customKeyMap?: Record<string, Pitch>;
+  keyNoteMap: Record<string, Pitches.Pitch>;
+  customKeyMap?: Record<string, Pitches.Pitch>;
   editMode?: boolean;
-  selectedNote?: Pitch | null;
-  conflictNote?: Pitch | null;
-  onNoteSelect?: (note: Pitch) => void;
+  selectedNote?: Pitches.Pitch | null;
+  conflictNote?: Pitches.Pitch | null;
+  onNoteSelect?: (note: Pitches.Pitch) => void;
 };
 
 export type PianoNotesProps = {
   id: string;
-  notes: Pitch[];
+  notes: Pitches.Pitch[];
   audio: AudioProps;
   mapping: MappingProps;
   whiteCount?: number;
@@ -55,7 +54,7 @@ export const PianoNotes = ({
 
   const labelMap = mapping.customKeyMap ?? mapping.keyNoteMap;
 
-  const getClassNames = (note: Pitch) => {
+  const getClassNames = (note: Pitches.Pitch) => {
     const isWhite = !note.includes("#");
     const playing = audio.playingNotes?.includes(note) && "playing";
     const isSelected = mapping.selectedNote === note && "selected";
@@ -75,7 +74,7 @@ export const PianoNotes = ({
       .join(" ");
   };
 
-  const handleMouseDown = (note: Pitch) => {
+  const handleMouseDown = (note: Pitches.Pitch) => {
     if (mapping.editMode) {
       mapping.onNoteSelect?.(note);
     } else {
@@ -84,7 +83,7 @@ export const PianoNotes = ({
   };
 
   const renderNote = (
-    note: Pitch,
+    note: Pitches.Pitch,
     index: number,
     noteWhiteStyle = whiteStyle,
     noteBlackStyle = blackStyle,

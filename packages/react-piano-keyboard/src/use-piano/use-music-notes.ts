@@ -6,12 +6,29 @@ import {
   SMOOTH_OUT_INTERVAL,
   MAX_OCTAVE,
   PITCH_CLASSES,
+  Waveforms,
 } from "../constants";
-import { pitchToFrequency } from "../pitches";
-import { FrequencyState, Pitch, SetOptions, Oscillator } from "../types";
+import { Pitches, pitchToFrequency } from "../pitches";
 
-type UseKeyboardProps = SetOptions & {
-  initialFrequencyStates?: FrequencyState[];
+export namespace Audio {
+  export type FrequencyState = {
+    oscillator: Waveforms.Oscillator;
+    gain: number;
+    hz: number;
+    playing: boolean;
+    touched: boolean;
+  };
+
+  export type SetOptions = {
+    oscillator?: Waveforms.Oscillator;
+    gain?: number;
+    attack?: number;
+    decay?: number;
+  };
+}
+
+type UseKeyboardProps = Audio.SetOptions & {
+  initialFrequencyStates?: Audio.FrequencyState[];
   audioContext?: AudioContext;
   analyserNode?: AnalyserNode;
 };
@@ -28,7 +45,7 @@ export const useMusicNotes = ({
   const [decay, setDecay] = useState(initialDecay);
   const [gain, setGain] = useState(defaultMaxGain);
   const [oscillator, setOscillator] = useState(defaultOscillator);
-  const [playingNotes, setPlayingNotes] = useState<Pitch[]>([]);
+  const [playingNotes, setPlayingNotes] = useState<Pitches.Pitch[]>([]);
 
   // Ref to track active voices (oscillator and gain nodes per Pitch)
   const activeVoicesRef = useRef<Record<string, { osc: OscillatorNode; gainNode: GainNode }>>({});
@@ -84,7 +101,7 @@ export const useMusicNotes = ({
     };
   }, []);
 
-  const start = useCallback((note: Pitch) => {
+  const start = useCallback((note: Pitches.Pitch) => {
     const ctx = getAudioContext();
     if (!ctx) return;
 
@@ -131,7 +148,7 @@ export const useMusicNotes = ({
     }
   }, [getAudioContext, analyserNode, oscillator, gain, attack]);
 
-  const stop = useCallback((note: Pitch) => {
+  const stop = useCallback((note: Pitches.Pitch) => {
     const voice = activeVoicesRef.current[note];
     if (!voice) return;
 
@@ -188,7 +205,7 @@ export const useMusicNotes = ({
     setPlayingNotes([]);
   }, []);
 
-  const set = useCallback(({ oscillator: newOsc, gain: newGain, attack: newAttack, decay: newDecay }: SetOptions) => {
+  const set = useCallback(({ oscillator: newOsc, gain: newGain, attack: newAttack, decay: newDecay }: Audio.SetOptions) => {
     if (newOsc) {
       setOscillator(newOsc);
       // Update the wave type of any currently active oscillators
@@ -220,7 +237,7 @@ export const useMusicNotes = ({
   // Reconstruct a reactive state array matching FrequencyState[] for API compatibility
   const frequenciesState = useMemo(() => {
     const keys = [...Array(MAX_OCTAVE).keys()].flatMap((octave) =>
-      PITCH_CLASSES.map((note) => `${note}${octave}` as Pitch)
+      PITCH_CLASSES.map((note) => `${note}${octave}` as Pitches.Pitch)
     );
 
     return keys.map((key) => {

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, KeyboardEvent } from "react";
-import { isPitch, Pitch } from "../types";
+import { Pitches, isPitch } from "../pitches";
 
 type UseKeyboardInputOptions = {
-  start: (note: Pitch) => void;
-  stop: (note: Pitch) => void;
-  activeMap: Record<string, Pitch>;
+  start: (note: Pitches.Pitch) => void;
+  stop: (note: Pitches.Pitch) => void;
+  activeMap: Record<string, Pitches.Pitch>;
   editMode?: boolean;
   onAssignKey?: (key: string) => void;
 };

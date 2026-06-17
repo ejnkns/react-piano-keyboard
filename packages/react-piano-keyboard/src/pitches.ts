@@ -5,39 +5,56 @@ import {
   PITCH_CLASSES,
   OCTAVE_LENGTH,
 } from "./constants";
-import {
-  PitchClass,
-  Pitch,
-  isPitch,
-  PitchData,
-  GetPitchRangeInput,
-} from "./types";
 
-const sliceNote = (pitch: Pitch) => {
-  const pitchClass = pitch.slice(0, -1) as PitchClass;
+export namespace Pitches {
+  export type PitchClass = (typeof PITCH_CLASSES)[number];
+  export type Pitch = `${PitchClass}${number}`;
+  export type PitchData = {
+    pitchClass: PitchClass;
+    octave: number;
+    cents: number;
+  };
+  export type GetPitchRangeInput = {
+    start: Pitch;
+    end: Pitch;
+  };
+}
+
+export const isPitchClass = (input: unknown): input is Pitches.PitchClass =>
+  typeof input === "string" && PITCH_CLASSES.includes(input as Pitches.PitchClass);
+
+export const isPitch = (input: unknown): input is Pitches.Pitch => {
+  if (typeof input !== "string") return false;
+  const match = input.match(/^([A-G]#?)(\d+)$/);
+  if (!match) return false;
+  return PITCH_CLASSES.includes(match[1] as Pitches.PitchClass);
+};
+
+const sliceNote = (pitch: Pitches.Pitch) => {
+  const pitchClass = pitch.slice(0, -1) as Pitches.PitchClass;
   const octave = parseInt(pitch.slice(-1));
   return { pitchClass, octave };
 };
 
-export const getPitchClass = (pitch: Pitch | PitchClass): PitchClass => {
+export const getPitchClass = (pitch: Pitches.Pitch | Pitches.PitchClass): Pitches.PitchClass => {
   return isPitch(pitch) ? sliceNote(pitch).pitchClass : pitch;
 };
 
-const getOctave = (pitch: PitchClass | Pitch) => {
+const getOctave = (pitch: Pitches.PitchClass | Pitches.Pitch) => {
   if (isPitch(pitch)) {
     return sliceNote(pitch).octave;
   }
   return DEFAULT_OCTAVE;
 };
 
-const makePitchData = (pitch: PitchClass | Pitch, octave?: number, cents?: number) =>
+const makePitchData = (pitch: Pitches.PitchClass | Pitches.Pitch, octave?: number, cents?: number) =>
   ({
     pitchClass: getPitchClass(pitch),
     octave: octave || getOctave(pitch),
     cents: cents || 0,
-  } satisfies PitchData);
+  } satisfies Pitches.PitchData);
 
-export const pitchToFrequency = (pitch: PitchData | PitchClass | Pitch) => {
+export const pitchToFrequency = (pitch: Pitches.PitchData | Pitches.PitchClass | Pitches.Pitch) => {
   const pitchData = typeof pitch === "string" ? makePitchData(pitch) : pitch;
   const { pitchClass, octave, cents } = pitchData;
 
@@ -50,7 +67,7 @@ export const pitchToFrequency = (pitch: PitchData | PitchClass | Pitch) => {
   return Number(frequency.toFixed(2));
 };
 
-export const pitchToIndex = (pitch: PitchData | Pitch) => {
+export const pitchToIndex = (pitch: Pitches.PitchData | Pitches.Pitch) => {
   const pitchData = typeof pitch === "string" ? makePitchData(pitch) : pitch;
   const { pitchClass, octave } = pitchData;
   const noteIndex = octave * OCTAVE_LENGTH + PITCH_CLASSES.indexOf(pitchClass);
@@ -76,10 +93,10 @@ export const indexToPitch = (index: number) => {
   return isPitch(pitch) ? pitch : undefined;
 };
 
-export const getPitchRange = ({ start, end }: GetPitchRangeInput): Pitch[] => {
+export const getPitchRange = ({ start, end }: Pitches.GetPitchRangeInput): Pitches.Pitch[] => {
   const startIndex = pitchToIndex(start);
   const endIndex = pitchToIndex(end);
-  const pitches: Pitch[] = [];
+  const pitches: Pitches.Pitch[] = [];
 
   for (let i = startIndex; i <= endIndex; i++) {
     const pitch = indexToPitch(i);

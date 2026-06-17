@@ -1,15 +1,15 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Pitch } from "../types";
+import { Pitches } from "../pitches";
 import { getKeyToNoteMap } from "./piano-utils";
 
-export const useKeyMapping = (notes: Pitch[], initialMap?: Record<string, Pitch>) => {
+export const useKeyMapping = (notes: Pitches.Pitch[], initialMap?: Record<string, Pitches.Pitch>) => {
   const defaultMap = useMemo(() => initialMap ?? getKeyToNoteMap(notes), [notes, initialMap]);
-  const [customMap, setCustomMap] = useState<Record<string, Pitch>>(() => ({
+  const [customMap, setCustomMap] = useState<Record<string, Pitches.Pitch>>(() => ({
     ...defaultMap,
   }));
   const [editMode, setEditMode] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<Pitch | null>(null);
-  const [conflictNote, setConflictNote] = useState<Pitch | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Pitches.Pitch | null>(null);
+  const [conflictNote, setConflictNote] = useState<Pitches.Pitch | null>(null);
   const hasCustomEdits = useRef(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export const useKeyMapping = (notes: Pitch[], initialMap?: Record<string, Pitch>
     setConflictNote(null);
   }, []);
 
-  const selectNote = useCallback((note: Pitch) => {
+  const selectNote = useCallback((note: Pitches.Pitch) => {
     setSelectedNote(note);
     setConflictNote(null);
   }, []);

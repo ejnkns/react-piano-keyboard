@@ -9,21 +9,22 @@ import {
   getPitchRangeForWhiteKeyCount,
 } from "./use-piano/piano-utils";
 import { OctaveRows } from "./keyboard-layout";
-import { Pitch, Oscillator } from "./types";
+import { Pitches } from "./pitches";
+import { Waveforms } from "./constants";
 
 export type UsePianoOptions = {
   rows?: 1 | 2;
-  start?: Pitch | { bottom: Pitch; top?: Pitch };
-  end?: Pitch;
+  start?: Pitches.Pitch | { bottom: Pitches.Pitch; top?: Pitches.Pitch };
+  end?: Pitches.Pitch;
   audioContext?: AudioContext;
   analyserNode?: AnalyserNode;
-  oscillator?: Oscillator;
+  oscillator?: Waveforms.Oscillator;
   gain?: number;
   attack?: number;
   decay?: number;
 };
 
-const getDefaultEnd = (startPitch: Pitch, rows: 1 | 2): Pitch => {
+const getDefaultEnd = (startPitch: Pitches.Pitch, rows: 1 | 2): Pitches.Pitch => {
   const startIndex = pitchToIndex(startPitch);
   if (rows === 2) {
     const maxWhite = Math.max(
@@ -48,11 +49,11 @@ export const usePiano = ({
   attack,
   decay,
 }: UsePianoOptions = {}) => {
-  const startPitch: Pitch =
+  const startPitch: Pitches.Pitch =
     typeof startProp === "string" ? startProp : startProp.bottom;
   const isTwoRow = rows === 2;
 
-  const bottomNotes = useMemo((): Pitch[] => {
+  const bottomNotes = useMemo((): Pitches.Pitch[] => {
     if (!isTwoRow) return [];
     const bottomStart =
       typeof startProp === "object" ? startProp.bottom : startPitch;
@@ -62,9 +63,9 @@ export const usePiano = ({
     );
   }, [isTwoRow, startProp, startPitch]);
 
-  const topNotes = useMemo((): Pitch[] => {
+  const topNotes = useMemo((): Pitches.Pitch[] => {
     if (!isTwoRow) return [];
-    const topStart: Pitch =
+    const topStart: Pitches.Pitch =
       typeof startProp === "object"
         ? startProp.top ?? startPitch
         : startPitch;
@@ -98,7 +99,7 @@ export const usePiano = ({
     return allNotes.filter((n) => mappedSet.has(n));
   }, [allNotes, defaultMap, end]);
 
-  const rowNotes = useMemo((): readonly [Pitch[], Pitch[]] | undefined => {
+  const rowNotes = useMemo((): readonly [Pitches.Pitch[], Pitches.Pitch[]] | undefined => {
     if (!isTwoRow) return undefined;
     return [bottomNotes, topNotes] as const;
   }, [isTwoRow, bottomNotes, topNotes]);

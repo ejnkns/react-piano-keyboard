@@ -1,5 +1,5 @@
 export { Piano } from "./piano";
-export { PianoNotes } from "./piano/notes";
-export type { PianoNotesProps } from "./piano/notes";
+export { PianoNotes } from "./piano/piano-notes";
+export type { PianoNotesProps } from "./piano/piano-notes";
 export { Controls } from "./piano/controls";
 export { WaveformVisualizer } from "./piano/waveform-visualizer";
