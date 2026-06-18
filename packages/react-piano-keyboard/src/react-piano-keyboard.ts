@@ -9,6 +9,6 @@ export { useKeyboardInput } from "./use-piano/use-keyboard-input";
 export { useAudioContext } from "./use-audio-context";
 export { Piano } from "./piano";
 export { PianoNotes } from "./piano/piano-notes";
-export { Controls } from "./piano/controls";
+export { Controls, type ControlSection } from "./piano/controls";
 export { WaveformVisualizer } from "./piano/waveform-visualizer";
 export type { PianoNotesProps } from "./piano/piano-notes";
