@@ -295,6 +295,7 @@ const CONTROL_SECTIONS: ControlSection[] = [
   "ADSR Envelope",
   "Filter",
   "LFO",
+  "Analog Clip",
 ];
 
 function InteractiveExample() {
@@ -413,46 +414,30 @@ function InteractiveExample() {
             <span>{"{"}</span>
             <span style={prop}>sections</span>
             <span style={punct}>{"={"}</span>
-            <span
-              style={{
-                ...(punct as React.CSSProperties),
-                display: "inline-flex",
-                gap: 2,
-                flexWrap: "wrap",
-                verticalAlign: "middle",
-              }}
-            >
-              {CONTROL_SECTIONS.map((s) => (
-                <label
-                  key={s}
+            <span style={punct}>{"{{ "}</span>
+            {CONTROL_SECTIONS.map((s, i) => (
+              <span key={s}>
+                <span style={prop}>{s}</span>
+                <span style={punct}>: </span>
+                <span
+                  onClick={() => toggleSection(s)}
                   style={{
                     fontFamily: "ui-monospace, monospace",
                     fontSize: 10,
+                    cursor: "pointer",
                     color: sectionVis[s]
                       ? "var(--piano-accent)"
                       : "var(--piano-text-muted)",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 1,
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={sectionVis[s]}
-                    onChange={() => toggleSection(s)}
-                    style={{
-                      accentColor: "var(--piano-accent)",
-                      cursor: "pointer",
-                      margin: 0,
-                      width: 10,
-                      height: 10,
-                    }}
-                  />
-                  {s}
-                </label>
-              ))}
-            </span>
+                  {sectionVis[s] ? "true" : "false"}
+                </span>
+                {i < CONTROL_SECTIONS.length - 1 && (
+                  <span style={punct}>{", "}</span>
+                )}
+              </span>
+            ))}
+            <span style={punct}>{" }}"}</span>
             <span style={punct}>{"}"}</span>
             <span style={punct}>{"}"}</span>
           </span>
