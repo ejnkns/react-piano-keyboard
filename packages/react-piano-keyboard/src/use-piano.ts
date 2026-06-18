@@ -10,7 +10,7 @@ import {
 } from "./use-piano/piano-utils";
 import { OctaveRows } from "./keyboard-layout";
 import { Pitches } from "./pitches";
-import { Waveforms } from "./constants";
+import { OscillatorConfig, DEFAULT_OSCILLATOR_COUNT, DEFAULT_OSCILLATOR_CONFIG, LfoTarget } from "./constants";
 
 export type UsePianoOptions = {
   rows?: 1 | 2;
@@ -18,10 +18,21 @@ export type UsePianoOptions = {
   end?: Pitches.Pitch;
   audioContext?: AudioContext;
   analyserNode?: AnalyserNode;
-  oscillator?: Waveforms.Oscillator;
+  oscillatorCount?: 1 | 2;
+  oscillators?: OscillatorConfig[];
   gain?: number;
   attack?: number;
   decay?: number;
+  sustain?: number;
+  release?: number;
+  filterCutoff?: number;
+  filterResonance?: number;
+  filterType?: BiquadFilterType;
+  lfoRate?: number;
+  lfoDepth?: number;
+  lfoTarget?: LfoTarget;
+  lfoWaveform?: OscillatorType;
+  enabled?: boolean;
 };
 
 const getDefaultEnd = (startPitch: Pitches.Pitch, rows: 1 | 2): Pitches.Pitch => {
@@ -44,10 +55,21 @@ export const usePiano = ({
   end,
   audioContext,
   analyserNode,
-  oscillator,
+  oscillatorCount,
+  oscillators,
   gain,
   attack,
   decay,
+  sustain,
+  release,
+  filterCutoff,
+  filterResonance,
+  filterType,
+  lfoRate,
+  lfoDepth,
+  lfoTarget,
+  lfoWaveform,
+  enabled,
 }: UsePianoOptions = {}) => {
   const startPitch: Pitches.Pitch =
     typeof startProp === "string" ? startProp : startProp.bottom;
@@ -107,10 +129,20 @@ export const usePiano = ({
   const audio = useMusicNotes({
     audioContext,
     analyserNode,
-    oscillator,
+    oscillatorCount,
+    oscillators,
     gain,
     attack,
     decay,
+    sustain,
+    release,
+    filterCutoff,
+    filterResonance,
+    filterType,
+    lfoRate,
+    lfoDepth,
+    lfoTarget,
+    lfoWaveform,
   });
 
   const mapping = useKeyMapping(allNotes, defaultMap);
@@ -121,6 +153,7 @@ export const usePiano = ({
     activeMap: mapping.keyMap,
     editMode: mapping.editMode,
     onAssignKey: mapping.assignKey,
+    enabled,
   });
 
   return {

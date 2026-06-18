@@ -118,6 +118,30 @@
   border-radius: 0 5px 5px 5px;
 }
 
+.powerButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--power-border);
+  box-sizing: border-box;
+  background: var(--power-bg);
+  box-shadow: var(--power-shadow);
+  transition: all 0.12s;
+}
+.powerButton:active {
+  background: var(--power-bg-active);
+  box-shadow: var(--power-shadow-active);
+
+  & > svg {
+    transform: scale(0.95);
+  }
+}
+
 .case {
   background: var(--piano-bg-primary);
   border-radius: 14px;

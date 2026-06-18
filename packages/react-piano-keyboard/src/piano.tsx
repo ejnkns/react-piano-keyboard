@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import { usePiano } from "./use-piano";
 import { PianoNotes } from "./piano/piano-notes";
-import { Controls } from "./piano/controls";
+import { Controls, type ControlSection } from "./piano/controls";
 import { WaveformVisualizer } from "./piano/waveform-visualizer";
 import { Pitches } from "./pitches";
-import { Waveforms } from "./constants";
+import { Waveforms, LfoTarget, OscillatorConfig } from "./constants";
 import { Audio } from "./use-piano/use-music-notes";
 import styles from "./piano/piano.module.css";
 
@@ -18,6 +18,7 @@ export namespace Piano {
       | {
           onClose?: () => void;
           defaultValues?: Partial<Audio.SetOptions>;
+          sections?: Partial<Record<ControlSection, boolean>>;
         };
     waveform?:
       | boolean
@@ -29,10 +30,20 @@ export namespace Piano {
         };
     audioContext?: AudioContext;
     analyserNode?: AnalyserNode;
-    oscillator?: Waveforms.Oscillator;
+    oscillatorCount?: 1 | 2;
+    oscillators?: OscillatorConfig[];
     gain?: number;
     attack?: number;
     decay?: number;
+    sustain?: number;
+    release?: number;
+    filterCutoff?: number;
+    filterResonance?: number;
+    filterType?: BiquadFilterType;
+    lfoRate?: number;
+    lfoDepth?: number;
+    lfoTarget?: LfoTarget;
+    lfoWaveform?: OscillatorType;
   };
 }
 
@@ -44,10 +55,20 @@ export function Piano({
   waveform: waveformProp,
   audioContext,
   analyserNode,
-  oscillator,
+  oscillatorCount,
+  oscillators,
   gain,
   attack,
   decay,
+  sustain,
+  release,
+  filterCutoff,
+  filterResonance,
+  filterType,
+  lfoRate,
+  lfoDepth,
+  lfoTarget,
+  lfoWaveform,
 }: Piano.Props) {
   const showControls = !!controlsProp;
   const showWaveform = !!waveformProp;
@@ -60,7 +81,7 @@ export function Piano({
 
   const isUncontrolled = !audioContext && !analyserNode;
 
-  const [isOn, setIsOn] = useState(() => !isUncontrolled);
+  const [isOn, setIsOn] = useState(false);
   const [localAudioContext, setLocalAudioContext] =
     useState<AudioContext | null>(null);
   const [localAnalyserNode, setLocalAnalyserNode] =
@@ -101,17 +122,25 @@ export function Piano({
     end,
     audioContext: effectiveAudioContext,
     analyserNode: effectiveAnalyserNode,
-    oscillator,
+    enabled: isOn,
+    oscillatorCount,
+    oscillators,
     gain,
     attack,
     decay,
+    sustain,
+    release,
+    filterCutoff,
+    filterResonance,
+    filterType,
+    lfoRate,
+    lfoDepth,
+    lfoTarget,
+    lfoWaveform,
   });
 
   const handlePowerOn = () => {
     setIsOn(true);
-    setTimeout(() => {
-      containerRef.current?.focus();
-    }, 50);
   };
 
   const handlePowerOff = () => {
@@ -164,12 +193,53 @@ export function Piano({
       }}
       className={styles.case}
     >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "6px 10px 0 0",
+          marginBottom: -4,
+          position: "relative",
+          zIndex: 5,
+        }}
+      >
+        <div
+          onClick={isOn ? handlePowerOff : handlePowerOn}
+          title={isOn ? "Power Off" : "Power On"}
+          className={styles.powerButton}
+          style={{
+            "--power-bg": isOn
+              ? "radial-gradient(circle at 35% 35%, #ff4444, #aa0000)"
+              : "radial-gradient(circle at 35% 35%, #555, #222)",
+            "--power-border": isOn ? "#ff6666" : "#444",
+            "--power-shadow": isOn
+              ? "0 0 8px #ff0000, 0 0 20px rgba(255,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.15)"
+              : "0 1px 3px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.08)",
+            "--power-bg-active": isOn
+              ? "radial-gradient(circle at 35% 35%, #cc3333, #880000)"
+              : "radial-gradient(circle at 35% 35%, #444, #1a1a1a)",
+            "--power-shadow-active": isOn
+              ? "inset 0 2px 6px rgba(0,0,0,0.6), 0 0 6px #ff0000"
+              : "inset 0 2px 6px rgba(0,0,0,0.6)",
+          } as React.CSSProperties}
+        >
+          <svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            <path d="M12 2v10" stroke={isOn ? "#fff" : "#888"} />
+            <path d="M6 7a8 8 0 1 0 12 0" stroke={isOn ? "#fff" : "#888"} />
+          </svg>
+        </div>
+      </div>
       {(showControls || showWaveform) && (
         <div className={styles.topPanel}>
           {showControls && (
             <Controls
               set={audio.set}
               defaultValues={audio.controlValues}
+              envelopeActivity={audio.envelopeActivity}
+              noteRange={{
+                min: notes[0] as string,
+                max: notes[notes.length - 1] as string,
+              }}
               onClose={
                 isUncontrolled ? handlePowerOff : controlsOverrides?.onClose
               }
@@ -187,73 +257,6 @@ export function Piano({
         </div>
       )}
       <div className={styles.notesWell}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "4px 8px 0 0",
-            marginBottom: -4,
-            position: "relative",
-            zIndex: 5,
-          }}
-        >
-          <div
-            onClick={isOn ? handlePowerOff : handlePowerOn}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              cursor: "pointer",
-              userSelect: "none",
-              padding: "4px 8px",
-              borderRadius: 4,
-              background: isOn ? "rgba(220, 38, 38, 0.15)" : "transparent",
-              transition: "background 0.2s",
-            }}
-          >
-            <span
-              style={{
-                fontSize: 9,
-                fontFamily: "ui-monospace, monospace",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                color: isOn
-                  ? "var(--piano-text-muted, #8a8a8a)"
-                  : "var(--piano-text-muted, #555)",
-                textTransform: "uppercase",
-              }}
-            >
-              Power
-            </span>
-            <div
-              style={{
-                position: "relative",
-                width: 36,
-                height: 18,
-                borderRadius: 9,
-                background: isOn ? "var(--piano-accent, #3b82f6)" : "#555",
-                transition: "background 0.3s",
-                boxShadow: isOn
-                  ? "inset 0 1px 3px rgba(0,0,0,0.3)"
-                  : "inset 0 1px 3px rgba(0,0,0,0.5)",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  left: isOn ? 18 : 2,
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  background: isOn ? "#fff" : "#ccc",
-                  transition: "left 0.25s, background 0.25s",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
-                }}
-              />
-            </div>
-          </div>
-        </div>
         <div
           style={{
             opacity: isOn ? 1 : 0.4,

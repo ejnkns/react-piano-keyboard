@@ -7,6 +7,7 @@ type UseKeyboardInputOptions = {
   activeMap: Record<string, Pitches.Pitch>;
   editMode?: boolean;
   onAssignKey?: (key: string) => void;
+  enabled?: boolean;
 };
 
 export const useKeyboardInput = ({
@@ -15,6 +16,7 @@ export const useKeyboardInput = ({
   activeMap,
   editMode,
   onAssignKey,
+  enabled = true,
 }: UseKeyboardInputOptions) => {
   useEffect(() => {
     if (!editMode || !onAssignKey) return;
@@ -25,6 +27,29 @@ export const useKeyboardInput = ({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [editMode, onAssignKey]);
+
+  useEffect(() => {
+    if (!enabled || editMode) return;
+    const down = (e: globalThis.KeyboardEvent) => {
+      if (e.repeat) return;
+      const note = activeMap[e.key];
+      if (isPitch(note)) {
+        start(note);
+      }
+    };
+    const up = (e: globalThis.KeyboardEvent) => {
+      const note = activeMap[e.key];
+      if (isPitch(note)) {
+        stop(note);
+      }
+    };
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    };
+  }, [enabled, editMode, activeMap, start, stop]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
