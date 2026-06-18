@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { useEffect, useMemo, useReducer, useState, useRef, useCallback } from "react";
 import {
   DEFAULT_OSCILLATOR_CONFIG,
   DEFAULT_OSCILLATOR_COUNT,
@@ -62,6 +62,34 @@ type UseKeyboardProps = Audio.SetOptions & {
 
 const DEFAULT_OSCS = [DEFAULT_OSCILLATOR_CONFIG, DEFAULT_OSCILLATOR_CONFIG];
 
+type SynthAction = Partial<Required<Audio.SetOptions>>;
+
+function synthReducer(
+  state: Required<Audio.SetOptions>,
+  action: SynthAction,
+): Required<Audio.SetOptions> {
+  return { ...state, ...action };
+}
+
+const UI_INITIAL_STATE: Required<Audio.SetOptions> = {
+  oscillatorCount: DEFAULT_OSCILLATOR_COUNT,
+  oscillators: DEFAULT_OSCS,
+  gain: MAX_GAIN,
+  attack: SMOOTH_IN_INTERVAL,
+  decay: SMOOTH_OUT_INTERVAL,
+  sustain: DEFAULT_SUSTAIN,
+  release: DEFAULT_RELEASE,
+  filterCutoff: DEFAULT_FILTER_CUTOFF,
+  filterResonance: DEFAULT_FILTER_RESONANCE,
+  filterType: DEFAULT_FILTER_TYPE,
+  lfoRate: DEFAULT_LFO_RATE,
+  lfoDepth: DEFAULT_LFO_DEPTH,
+  lfoTarget: DEFAULT_LFO_TARGET,
+  lfoWaveform: DEFAULT_LFO_WAVEFORM,
+  analogClipDrive: DEFAULT_ANALOG_CLIP_DRIVE,
+  analogClipInput: DEFAULT_ANALOG_CLIP_INPUT,
+};
+
 export const useMusicNotes = ({
   oscillatorCount: defaultOscCount = DEFAULT_OSCILLATOR_COUNT,
   oscillators: defaultOscConfigs = DEFAULT_OSCS,
@@ -82,47 +110,10 @@ export const useMusicNotes = ({
   audioContext,
   analyserNode,
 }: UseKeyboardProps = {}) => {
-  const [attack, setAttack] = useState(initialAttack);
-  const [decay, setDecay] = useState(initialDecay);
-  const [sustain, setSustain] = useState(initialSustain);
-  const [release, setRelease] = useState(initialRelease);
-  const [gain, setGain] = useState(defaultMaxGain);
-  const [oscCount, setOscCount] = useState<1 | 2>(defaultOscCount);
-  const [oscConfigs, setOscConfigs] =
-    useState<OscillatorConfig[]>(defaultOscConfigs);
-  const [filterCutoff, setFilterCutoff] = useState(defaultFilterCutoff);
-  const [filterResonance, setFilterResonance] = useState(
-    defaultFilterResonance,
-  );
-  const [filterType, setFilterType] = useState(defaultFilterType);
-  const [lfoRate, setLfoRate] = useState(defaultLfoRate);
-  const [lfoDepth, setLfoDepth] = useState(defaultLfoDepth);
-  const [lfoTarget, setLfoTarget] = useState(defaultLfoTarget);
-  const [lfoWaveform, setLfoWaveform] = useState(defaultLfoWaveform);
-  const [analogClipDrive, setAnalogClipDrive] = useState(
-    defaultAnalogClipDrive,
-  );
-  const [analogClipInput, setAnalogClipInput] = useState(
-    defaultAnalogClipInput,
-  );
-  const [playingNotes, setPlayingNotes] = useState<Pitches.Pitch[]>([]);
-
-  const updateOsc = useCallback(
-    (index: number, partial: Partial<OscillatorConfig>) => {
-      setOscConfigs((prev) =>
-        prev.map((c, i) => (i === index ? { ...c, ...partial } : c)),
-      );
-    },
-    [],
-  );
-
-  const engineRef = useRef<ReturnType<typeof createAudioEngine> | null>(null);
-  if (!engineRef.current) engineRef.current = createAudioEngine();
-  const engine = engineRef.current;
-
-  const optsRef = useRef<Required<Audio.SetOptions>>({
+  const initSynthState: Required<Audio.SetOptions> = {
+    ...UI_INITIAL_STATE,
     oscillatorCount: defaultOscCount,
-    oscillators: [DEFAULT_OSCILLATOR_CONFIG, DEFAULT_OSCILLATOR_CONFIG],
+    oscillators: defaultOscConfigs,
     gain: defaultMaxGain,
     attack: initialAttack,
     decay: initialDecay,
@@ -137,7 +128,15 @@ export const useMusicNotes = ({
     lfoWaveform: defaultLfoWaveform,
     analogClipDrive: defaultAnalogClipDrive,
     analogClipInput: defaultAnalogClipInput,
-  });
+  };
+
+  const [synthUI, dispatch] = useReducer(synthReducer, initSynthState);
+  const optsRef = useRef(initSynthState);
+  const [playingNotes, setPlayingNotes] = useState<Pitches.Pitch[]>([]);
+
+  const engineRef = useRef<ReturnType<typeof createAudioEngine> | null>(null);
+  if (!engineRef.current) engineRef.current = createAudioEngine();
+  const engine = engineRef.current;
 
   const activeVoicesRef = useRef<ActiveVoice[]>([]);
   const voiceIdCounter = useRef(0);
@@ -346,210 +345,72 @@ export const useMusicNotes = ({
       const prev = optsRef.current;
       const options =
         typeof optionsInput === "function" ? optionsInput(prev) : optionsInput;
-      const merged = { ...prev, ...options };
-      optsRef.current = merged;
+
+      optsRef.current = { ...prev, ...options };
+      dispatch(options);
 
       const voices = activeVoicesRef.current;
+      const ctx = getAudioContext();
+      const time = ctx?.currentTime ?? 0;
+      const T = 0.02;
 
-      if (
-        options.oscillatorCount !== undefined &&
-        options.oscillatorCount !== prev.oscillatorCount
-      ) {
-        setOscCount(options.oscillatorCount);
-        if (options.oscillatorCount < prev.oscillatorCount) {
-          const count = options.oscillatorCount;
-          const prevCount = prev.oscillatorCount;
-          voices.forEach(({ oscillators }) => {
-            for (let i: number = count; i < prevCount; i++) {
-              const oscv = oscillators[i];
-              if (!oscv) continue;
-              try {
-                oscv.osc.stop();
-              } catch {}
-              try {
-                oscv.osc.disconnect();
-              } catch {}
-              try {
-                oscv.gain.disconnect();
-              } catch {}
-              try {
-                oscv.pan.disconnect();
-              } catch {}
+      // --- Oscillator count reduction cleanup ---
+      if (options.oscillatorCount !== undefined && options.oscillatorCount < prev.oscillatorCount) {
+        const count = options.oscillatorCount;
+        const prevCount = prev.oscillatorCount;
+        voices.forEach(({ oscillators }) => {
+          for (let i = count; i < prevCount; i++) {
+            const oscv = oscillators[i];
+            if (!oscv) continue;
+            try { oscv.osc.stop(); } catch {}
+            try { oscv.osc.disconnect(); } catch {}
+            try { oscv.gain.disconnect(); } catch {}
+            try { oscv.pan.disconnect(); } catch {}
+          }
+        });
+      }
+
+      // --- Oscillator live modulation ---
+      if (options.oscillators !== undefined) {
+        options.oscillators.forEach((config, i) => {
+          const prevConfig = prev.oscillators[i];
+          if (!prevConfig) return;
+          voices.forEach(({ oscillators: oscs, note }) => {
+            const oscv = oscs[i];
+            if (!oscv) return;
+            if (config.waveform !== prevConfig.waveform) oscv.osc.type = config.waveform;
+            if (config.gain !== prevConfig.gain) oscv.gain.gain.setTargetAtTime(config.gain, time, T);
+            if (config.detune !== prevConfig.detune) oscv.osc.detune.setTargetAtTime(config.detune, time, T);
+            if (config.pan !== prevConfig.pan) oscv.pan.pan.setTargetAtTime(config.pan, time, T);
+            if (config.octave !== prevConfig.octave) {
+              oscv.osc.frequency.value = pitchToFrequency(note) * Math.pow(2, config.octave);
             }
           });
-        }
-      }
-
-      if (options.oscillators !== undefined) {
-        const newOscs = options.oscillators;
-        const prevOscs = prev.oscillators;
-        newOscs.forEach((config, i) => {
-          const prevConfig = prevOscs[i];
-          if (!prevConfig) return;
-
-          if (config.waveform !== prevConfig.waveform) {
-            updateOsc(i, { waveform: config.waveform });
-            voices.forEach(({ oscillators }) => {
-              if (oscillators[i]?.osc)
-                oscillators[i].osc.type = config.waveform;
-            });
-          }
-          if (config.gain !== prevConfig.gain) {
-            updateOsc(i, { gain: config.gain });
-            voices.forEach(({ oscillators }) => {
-              if (oscillators[i]?.gain)
-                oscillators[i].gain.gain.value = config.gain;
-            });
-          }
-          if (config.detune !== prevConfig.detune) {
-            updateOsc(i, { detune: config.detune });
-            voices.forEach(({ oscillators }) => {
-              if (oscillators[i]?.osc)
-                oscillators[i].osc.detune.value = config.detune;
-            });
-          }
-          if (config.octave !== prevConfig.octave) {
-            updateOsc(i, { octave: config.octave });
-            voices.forEach(({ note, oscillators }) => {
-              if (oscillators[i]?.osc) {
-                const freq = pitchToFrequency(note);
-                oscillators[i].osc.frequency.value =
-                  freq * Math.pow(2, config.octave);
-              }
-            });
-          }
-          if (config.pan !== prevConfig.pan) {
-            updateOsc(i, { pan: config.pan });
-            voices.forEach(({ oscillators }) => {
-              if (oscillators[i]?.pan)
-                oscillators[i].pan.pan.value = config.pan;
-            });
-          }
         });
       }
 
-      if (options.gain !== undefined && options.gain !== prev.gain) {
-        setGain(options.gain);
+      // --- Filter live modulation ---
+      if (options.filterCutoff !== undefined) {
+        voices.forEach(({ filterNode }) =>
+          filterNode.frequency.setTargetAtTime(options.filterCutoff!, time, T));
       }
-      if (options.attack !== undefined && options.attack !== prev.attack) {
-        setAttack(options.attack);
+      if (options.filterResonance !== undefined) {
+        voices.forEach(({ filterNode }) =>
+          filterNode.Q.setTargetAtTime(options.filterResonance!, time, T));
       }
-      if (options.decay !== undefined && options.decay !== prev.decay) {
-        setDecay(options.decay);
+      if (options.filterType !== undefined) {
+        voices.forEach(({ filterNode }) => filterNode.type = options.filterType!);
       }
-      if (options.sustain !== undefined && options.sustain !== prev.sustain) {
-        setSustain(options.sustain);
-      }
-      if (options.release !== undefined && options.release !== prev.release) {
-        setRelease(options.release);
-      }
-      if (
-        options.filterCutoff !== undefined &&
-        options.filterCutoff !== prev.filterCutoff
-      ) {
-        setFilterCutoff(options.filterCutoff);
-        voices.forEach(({ filterNode }) => {
-          filterNode.frequency.value = options.filterCutoff!;
-        });
-      }
-      if (
-        options.filterResonance !== undefined &&
-        options.filterResonance !== prev.filterResonance
-      ) {
-        setFilterResonance(options.filterResonance);
-        voices.forEach(({ filterNode }) => {
-          filterNode.Q.value = options.filterResonance!;
-        });
-      }
-      if (
-        options.filterType !== undefined &&
-        options.filterType !== prev.filterType
-      ) {
-        setFilterType(options.filterType);
-        voices.forEach(({ filterNode }) => {
-          filterNode.type = options.filterType!;
-        });
-      }
-      if (options.lfoRate !== undefined && options.lfoRate !== prev.lfoRate) {
-        setLfoRate(options.lfoRate);
-        engine.updateLfoRate(options.lfoRate);
-      }
-      if (
-        options.lfoDepth !== undefined &&
-        options.lfoDepth !== prev.lfoDepth
-      ) {
-        setLfoDepth(options.lfoDepth);
-        engine.updateLfoDepth(options.lfoDepth);
-      }
-      if (
-        options.lfoTarget !== undefined &&
-        options.lfoTarget !== prev.lfoTarget
-      ) {
-        setLfoTarget(options.lfoTarget);
-        engine.relinkLfo(options.lfoTarget, voices);
-      }
-      if (
-        options.lfoWaveform !== undefined &&
-        options.lfoWaveform !== prev.lfoWaveform
-      ) {
-        setLfoWaveform(options.lfoWaveform);
-        engine.updateLfoWaveform(options.lfoWaveform);
-      }
-      if (
-        options.analogClipDrive !== undefined &&
-        options.analogClipDrive !== prev.analogClipDrive
-      ) {
-        setAnalogClipDrive(options.analogClipDrive);
-        engine.updateAnalogClipDrive(options.analogClipDrive);
-      }
-      if (
-        options.analogClipInput !== undefined &&
-        options.analogClipInput !== prev.analogClipInput
-      ) {
-        setAnalogClipInput(options.analogClipInput);
-        engine.updateAnalogClipInput(options.analogClipInput);
-      }
+
+      // --- LFO & Analog Clip ---
+      if (options.lfoRate !== undefined) engine.updateLfoRate(options.lfoRate);
+      if (options.lfoDepth !== undefined) engine.updateLfoDepth(options.lfoDepth);
+      if (options.lfoWaveform !== undefined) engine.updateLfoWaveform(options.lfoWaveform);
+      if (options.lfoTarget !== undefined) engine.relinkLfo(options.lfoTarget, voices);
+      if (options.analogClipDrive !== undefined) engine.updateAnalogClipDrive(options.analogClipDrive);
+      if (options.analogClipInput !== undefined) engine.updateAnalogClipInput(options.analogClipInput);
     },
-    [updateOsc, engine],
-  );
-
-  const controlValues = useMemo(
-    () => ({
-      oscillatorCount: oscCount,
-      oscillators: oscConfigs,
-      gain,
-      attack,
-      decay,
-      sustain,
-      release,
-      filterCutoff,
-      filterResonance,
-      filterType,
-      lfoRate,
-      lfoDepth,
-      lfoTarget,
-      lfoWaveform,
-      analogClipDrive,
-      analogClipInput,
-    }),
-    [
-      oscCount,
-      oscConfigs,
-      gain,
-      attack,
-      decay,
-      sustain,
-      release,
-      filterCutoff,
-      filterResonance,
-      filterType,
-      lfoRate,
-      lfoDepth,
-      lfoTarget,
-      lfoWaveform,
-      analogClipDrive,
-      analogClipInput,
-    ],
+    [engine, getAudioContext],
   );
 
   const frequenciesState = useMemo(() => {
@@ -561,13 +422,13 @@ export const useMusicNotes = ({
       const isPlaying = playingNotes.includes(key);
       return {
         hz: pitchToFrequency(key),
-        gain,
-        oscillators: oscConfigs.map((c) => c.waveform),
+        gain: synthUI.gain,
+        oscillators: synthUI.oscillators.map((c) => c.waveform),
         playing: isPlaying,
         touched: isPlaying,
       };
     });
-  }, [playingNotes, oscConfigs, gain]);
+  }, [playingNotes, synthUI.oscillators, synthUI.gain]);
 
   return {
     start,
@@ -575,7 +436,7 @@ export const useMusicNotes = ({
     stopAll,
     set,
     state: frequenciesState,
-    controlValues,
+    controlValues: synthUI,
     playingNotes,
     envelopeActivity,
   };
