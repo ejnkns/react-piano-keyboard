@@ -6,10 +6,14 @@ import {
   WaveformVisualizer,
   usePiano,
   useAudioContext,
-  pitchToIndex,
-  indexToPitch,
+  PITCH_CLASSES,
 } from "react-piano-keyboard";
-import type { Pitch } from "react-piano-keyboard";
+import type {
+  Pitches,
+  UseMusicNotes,
+  Audio,
+  ControlSection,
+} from "react-piano-keyboard";
 
 const section: React.CSSProperties = {
   padding: 20,
@@ -48,24 +52,281 @@ const selectStyle: React.CSSProperties = {
   margin: "0 2px",
 };
 
+const btnStyle: React.CSSProperties = {
+  fontFamily: "ui-monospace, monospace",
+  fontSize: 11,
+  padding: "4px 10px",
+  cursor: "pointer",
+  background: "var(--piano-bg-elevated)",
+  color: "var(--piano-text-secondary)",
+  border: "1px solid var(--piano-border)",
+  borderRadius: 4,
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+};
+
+const activeBtn: React.CSSProperties = {
+  ...btnStyle,
+  background: "var(--piano-accent)",
+  color: "var(--piano-bg-tertiary)",
+  borderColor: "var(--piano-accent)",
+};
+
+type Preset = {
+  name: string;
+  opts: Partial<Audio.SetOptions>;
+};
+
+const PRESETS: Preset[] = [
+  {
+    name: "Default",
+    opts: {
+      oscillators: [
+        { waveform: "sine", gain: 0.5, detune: 0, octave: 0, pan: 0 },
+        { waveform: "sine", gain: 0.5, detune: 0, octave: 0, pan: 0 },
+      ],
+      gain: 0.5,
+      attack: 0.2,
+      decay: 0.4,
+      sustain: 0.5,
+      release: 0.4,
+      filterCutoff: 20000,
+      filterResonance: 0.1,
+      filterType: "lowpass",
+      lfoRate: 4,
+      lfoDepth: 0,
+      lfoTarget: "none",
+      lfoWaveform: "sine",
+    },
+  },
+  {
+    name: "Warm Pad",
+    opts: {
+      oscillators: [
+        { waveform: "sawtooth", gain: 0.4, detune: 0, octave: 0, pan: 0 },
+        { waveform: "sine", gain: 0.4, detune: 1, octave: 0, pan: 0 },
+      ],
+      gain: 0.4,
+      attack: 0.8,
+      decay: 0.3,
+      sustain: 0.7,
+      release: 1.5,
+      filterCutoff: 2000,
+      filterResonance: 1.5,
+      filterType: "lowpass",
+      lfoRate: 3,
+      lfoDepth: 0.3,
+      lfoTarget: "volume",
+      lfoWaveform: "sine",
+    },
+  },
+  {
+    name: "Filter Sweep",
+    opts: {
+      oscillators: [
+        { waveform: "sawtooth", gain: 0.5, detune: 0, octave: 0, pan: 0 },
+        { waveform: "square", gain: 0.3, detune: 0, octave: 0, pan: 0 },
+      ],
+      gain: 0.45,
+      attack: 0.05,
+      decay: 0.2,
+      sustain: 0.4,
+      release: 0.8,
+      filterCutoff: 500,
+      filterResonance: 6,
+      filterType: "lowpass",
+      lfoRate: 2,
+      lfoDepth: 0.5,
+      lfoTarget: "filter",
+      lfoWaveform: "sine",
+    },
+  },
+  {
+    name: "Pluck",
+    opts: {
+      oscillators: [
+        { waveform: "triangle", gain: 0.5, detune: 0, octave: 0, pan: 0 },
+        { waveform: "sine", gain: 0.2, detune: 0, octave: 0, pan: 0 },
+      ],
+      gain: 0.5,
+      attack: 0.01,
+      decay: 0.15,
+      sustain: 0,
+      release: 0.1,
+      filterCutoff: 4000,
+      filterResonance: 2,
+      filterType: "lowpass",
+      lfoRate: 4,
+      lfoDepth: 0,
+      lfoTarget: "none",
+      lfoWaveform: "sine",
+    },
+  },
+  {
+    name: "Wobble Bass",
+    opts: {
+      oscillators: [
+        { waveform: "square", gain: 0.5, detune: -100, octave: 0, pan: 0 },
+        { waveform: "sawtooth", gain: 0.3, detune: -100, octave: 0, pan: 0 },
+      ],
+      gain: 0.35,
+      attack: 0.02,
+      decay: 0.1,
+      sustain: 0.3,
+      release: 0.6,
+      filterCutoff: 800,
+      filterResonance: 8,
+      filterType: "lowpass",
+      lfoRate: 6,
+      lfoDepth: 0.6,
+      lfoTarget: "filter",
+      lfoWaveform: "sine",
+    },
+  },
+  {
+    name: "Vibrato",
+    opts: {
+      oscillators: [
+        { waveform: "sine", gain: 0.4, detune: 0, octave: 0, pan: 0 },
+        { waveform: "triangle", gain: 0.3, detune: 0, octave: 0, pan: 0 },
+      ],
+      gain: 0.4,
+      attack: 0.1,
+      decay: 0.2,
+      sustain: 0.6,
+      release: 0.5,
+      filterCutoff: 20000,
+      filterResonance: 0.1,
+      filterType: "lowpass",
+      lfoRate: 5,
+      lfoDepth: 0.3,
+      lfoTarget: "pitch",
+      lfoWaveform: "sine",
+    },
+  },
+];
+
+function PresetBar({ set }: { set: UseMusicNotes["set"] }) {
+  const [active, setActive] = useState("Default");
+  return (
+    <div
+      style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "8px 0" }}
+    >
+      <span
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          color: "var(--piano-text-muted)",
+          letterSpacing: "0.05em",
+          textTransform: "uppercase",
+          padding: "4px 0",
+          fontFamily: "ui-monospace, monospace",
+        }}
+      >
+        Presets:
+      </span>
+      {PRESETS.map((p) => (
+        <button
+          key={p.name}
+          type="button"
+          style={active === p.name ? activeBtn : btnStyle}
+          onClick={() => {
+            setActive(p.name);
+            set(p.opts);
+          }}
+        >
+          {p.name}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function PitchSelect({
+  note,
+  octave,
+  onNoteChange,
+  onOctaveChange,
+  octaveMin = 0,
+  octaveMax = 5,
+}: {
+  note: string;
+  octave: number;
+  onNoteChange: (n: string) => void;
+  onOctaveChange: (o: number) => void;
+  octaveMin?: number;
+  octaveMax?: number;
+}) {
+  const octaves = Array.from(
+    { length: octaveMax - octaveMin + 1 },
+    (_, i) => i + octaveMin,
+  );
+  return (
+    <span style={{ display: "inline-flex", gap: 2, alignItems: "center" }}>
+      <select
+        value={note}
+        onChange={(e) => onNoteChange(e.target.value)}
+        style={selectStyle}
+      >
+        {PITCH_CLASSES.map((n) => (
+          <option key={n} value={n}>
+            {n}
+          </option>
+        ))}
+      </select>
+      <select
+        value={octave}
+        onChange={(e) => onOctaveChange(Number(e.target.value))}
+        style={selectStyle}
+      >
+        {octaves.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    </span>
+  );
+}
+
+const CONTROL_SECTIONS: ControlSection[] = [
+  "Presets",
+  "Oscillators",
+  "ADSR Envelope",
+  "Filter",
+  "LFO",
+];
+
 function InteractiveExample() {
   const [rows, setRows] = useState<1 | 2>(2);
-  const [start, setStart] = useState<string>("C3");
-  const [startBottom, setStartBottom] = useState<string>("C3");
-  const [startTop, setStartTop] = useState<string>("C4");
-  const [end, setEnd] = useState<string>("C5");
+  const [startNote, setStartNote] = useState("C");
+  const [startOctave, setStartOctave] = useState(3);
+  const [startBottomNote, setStartBottomNote] = useState("C");
+  const [startBottomOctave, setStartBottomOctave] = useState(3);
+  const [startTopNote, setStartTopNote] = useState("C");
+  const [startTopOctave, setStartTopOctave] = useState(4);
+  const [endNote, setEndNote] = useState("C");
+  const [endOctave, setEndOctave] = useState(5);
   const [showControls, setShowControls] = useState(true);
   const [showWaveform, setShowWaveform] = useState(true);
+  const [sectionVis, setSectionVis] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(CONTROL_SECTIONS.map((s) => [s, true])),
+  );
 
-  const pitches = useMemo(() => {
-    const result: string[] = [];
-    const startIdx = pitchToIndex("C2" as Pitch);
-    for (let i = 0; i < 48; i++) {
-      const p = indexToPitch(startIdx + i);
-      if (p) result.push(p);
-    }
-    return result;
-  }, []);
+  const start = `${startNote}${startOctave}` as Pitches.Pitch;
+  const startBottom = `${startBottomNote}${startBottomOctave}` as Pitches.Pitch;
+  const startTop = `${startTopNote}${startTopOctave}` as Pitches.Pitch;
+  const end = `${endNote}${endOctave}` as Pitches.Pitch;
+
+  const allOn = CONTROL_SECTIONS.every((s) => sectionVis[s]);
+  const controlsProp = !showControls
+    ? false
+    : allOn
+      ? true
+      : { sections: sectionVis as Record<ControlSection, boolean> };
+
+  const toggleSection = (s: string) =>
+    setSectionVis((p) => ({ ...p, [s]: !p[s] }));
 
   return (
     <section style={section}>
@@ -89,46 +350,31 @@ function InteractiveExample() {
           <>
             <span style={prop}> start</span>
             <span style={punct}>{'="'}</span>
-            <select
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-              style={selectStyle}
-            >
-              {pitches.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <PitchSelect
+              note={startNote}
+              octave={startOctave}
+              onNoteChange={setStartNote}
+              onOctaveChange={setStartOctave}
+            />
             <span style={punct}>{'"}'}</span>
           </>
         ) : (
           <>
             <span style={prop}> start</span>
             <span style={punct}>{'={{ bottom: "'}</span>
-            <select
-              value={startBottom}
-              onChange={(e) => setStartBottom(e.target.value)}
-              style={selectStyle}
-            >
-              {pitches.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <PitchSelect
+              note={startBottomNote}
+              octave={startBottomOctave}
+              onNoteChange={setStartBottomNote}
+              onOctaveChange={setStartBottomOctave}
+            />
             <span style={punct}>{'", top: "'}</span>
-            <select
-              value={startTop}
-              onChange={(e) => setStartTop(e.target.value)}
-              style={selectStyle}
-            >
-              {pitches.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <PitchSelect
+              note={startTopNote}
+              octave={startTopOctave}
+              onNoteChange={setStartTopNote}
+              onOctaveChange={setStartTopOctave}
+            />
             <span style={punct}>{'" }}'}</span>
           </>
         )}
@@ -137,17 +383,12 @@ function InteractiveExample() {
             <br />
             <span style={prop}> end</span>
             <span style={punct}>{'="'}</span>
-            <select
-              value={end}
-              onChange={(e) => setEnd(e.target.value)}
-              style={selectStyle}
-            >
-              {pitches.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+            <PitchSelect
+              note={endNote}
+              octave={endOctave}
+              onNoteChange={setEndNote}
+              onOctaveChange={setEndOctave}
+            />
             <span style={punct}>{'"}'}</span>
           </>
         )}
@@ -160,6 +401,62 @@ function InteractiveExample() {
           onChange={(e) => setShowControls(e.target.checked)}
           style={{ accentColor: "var(--piano-accent)", cursor: "pointer" }}
         />
+        {showControls && (
+          <span
+            style={{
+              ...(punct as React.CSSProperties),
+              display: "inline-flex",
+              gap: 4,
+              alignItems: "center",
+            }}
+          >
+            <span>{"{"}</span>
+            <span style={prop}>sections</span>
+            <span style={punct}>{"={"}</span>
+            <span
+              style={{
+                ...(punct as React.CSSProperties),
+                display: "inline-flex",
+                gap: 2,
+                flexWrap: "wrap",
+                verticalAlign: "middle",
+              }}
+            >
+              {CONTROL_SECTIONS.map((s) => (
+                <label
+                  key={s}
+                  style={{
+                    fontFamily: "ui-monospace, monospace",
+                    fontSize: 10,
+                    color: sectionVis[s]
+                      ? "var(--piano-accent)"
+                      : "var(--piano-text-muted)",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={sectionVis[s]}
+                    onChange={() => toggleSection(s)}
+                    style={{
+                      accentColor: "var(--piano-accent)",
+                      cursor: "pointer",
+                      margin: 0,
+                      width: 10,
+                      height: 10,
+                    }}
+                  />
+                  {s}
+                </label>
+              ))}
+            </span>
+            <span style={punct}>{"}"}</span>
+            <span style={punct}>{"}"}</span>
+          </span>
+        )}
         <span style={punct}>{"}"}</span>
         <br />
         <span style={prop}> waveform</span>
@@ -176,13 +473,9 @@ function InteractiveExample() {
       </div>
       <Piano
         rows={rows}
-        start={
-          rows === 1
-            ? (start as Pitch)
-            : { bottom: startBottom as Pitch, top: startTop as Pitch }
-        }
-        end={rows === 1 ? (end as Pitch) : undefined}
-        controls={showControls}
+        start={rows === 1 ? start : { bottom: startBottom, top: startTop }}
+        end={rows === 1 ? end : undefined}
+        controls={controlsProp}
         waveform={showWaveform}
       />
     </section>
@@ -198,7 +491,7 @@ function HookWithPianoNotes() {
 
   const { notes, defaultMap, audio, mapping, inputProps } = usePiano({
     rows: 2,
-    start: "C3",
+    start: "C2",
     analyserNode: analyser,
   });
 
@@ -234,8 +527,12 @@ function HookWithPianoNotes() {
         >
           <code>{`const { notes, audio, mapping, inputProps } = usePiano({
   rows: 2,
-  start: "C3",
+  start: "C2",
   analyserNode: analyser,
+  // New Phase 1 props (optional):
+  // sustain: 0.7, release: 1.2,
+  // filterCutoff: 2000, filterResonance: 3,
+  // lfoRate: 4, lfoDepth: 0.3, lfoTarget: "filter",
 })
 
 return (
@@ -249,7 +546,7 @@ return (
 )`}</code>
         </pre>
       </div>
-      <Controls set={audio.set} defaultValues={audio.controlValues} />
+      <PresetBar set={audio.set} />
       <div style={{ marginTop: 12 }}>
         <WaveformVisualizer analyserNode={analyser} height={120} />
       </div>
@@ -345,7 +642,7 @@ export default function App() {
         style={{
           fontFamily: "system-ui, sans-serif",
           padding: 32,
-          maxWidth: 1400,
+          maxWidth: 2160,
           display: "flex",
           flexDirection: "column",
           gap: 24,
@@ -442,9 +739,9 @@ export default function App() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <InteractiveExample />
           </div>
-          <div>
+          {/* <div>
             <HookWithPianoNotes />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
