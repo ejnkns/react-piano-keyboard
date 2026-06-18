@@ -102,7 +102,7 @@ export const getTwoRowKeyToNoteMap = (
   bottomNotes: Pitches.Pitch[],
   topNotes: Pitches.Pitch[],
 ): Record<string, Pitches.Pitch> => {
-  return {
+  const result = {
     ...mapNotesToRow(
       bottomNotes,
       OctaveRows.bottom.whiteKeys,
@@ -114,4 +114,34 @@ export const getTwoRowKeyToNoteMap = (
       OctaveRows.top.blackKeys,
     ),
   };
+
+  const topStart = topNotes[0];
+  if (topStart) {
+    const pitchClass = topStart.replace(/\d/, "");
+    const offset =
+      pitchClass === "C" || pitchClass === "F" ? 1 : 2;
+    const qIdx = pitchToIndex(topStart) - offset;
+    if (qIdx >= 0) {
+      const precedingWhite = indexToPitch(qIdx);
+      if (precedingWhite) result.q = precedingWhite;
+    }
+  }
+
+  const lastWhiteNote = result["/"];
+  if (lastWhiteNote) {
+    const nextIdx = pitchToIndex(lastWhiteNote) + 1;
+    const nextNote = indexToPitch(nextIdx);
+    if (nextNote?.includes("#")) result["'"] = nextNote;
+  }
+
+  const topFirstWhite = result["w"];
+  if (topFirstWhite) {
+    const belowIdx = pitchToIndex(topFirstWhite) - 1;
+    if (belowIdx >= 0) {
+      const belowNote = indexToPitch(belowIdx);
+      if (belowNote?.includes("#")) result["2"] = belowNote;
+    }
+  }
+
+  return result;
 };

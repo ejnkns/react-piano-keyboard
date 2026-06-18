@@ -153,7 +153,7 @@ describe("getTwoRowKeyToNoteMap", () => {
     const map = getTwoRowKeyToNoteMap(bottom, top);
 
     expect(map["z"]).toBe("C3");
-    expect(map["q"]).toBe("F4");
+    expect(map["q"]).toBe("B4");
     expect(map["w"]).toBe("C5");
     expect(map["]"]).toBe("F6");
   });
@@ -174,7 +174,7 @@ describe("getTwoRowKeyToNoteMap", () => {
     expect(map[","]).toBe("C4");
     expect(map["."]).toBe("D4");
     expect(map["/"]).toBe("E4");
-    expect(map["q"]).toBe("F4");
+    expect(map["q"]).toBe("B3");
 
     // bottom black keys
     expect(map["s"]).toBe("C#3");
@@ -217,8 +217,8 @@ describe("getTwoRowKeyToNoteMap", () => {
     // E4: bottom→/, top→r
     expect(map["/"]).toBe("E4");
     expect(map["r"]).toBe("E4");
-    // F4: bottom→q, top→t
-    expect(map["q"]).toBe("F4");
+    // F4: top→t (q is special mapped to preceding white note B3)
+    expect(map["q"]).toBe("B3");
     expect(map["t"]).toBe("F4");
   });
 
@@ -238,6 +238,28 @@ describe("getTwoRowKeyToNoteMap", () => {
     const map = getTwoRowKeyToNoteMap(bottom, []);
     // Only 11 white key entries in OctaveRows.bottom
     expect(Object.keys(map).length).toBeLessThanOrEqual(22); // 11 white + 11 black max
+  });
+
+  it("maps ' to the black note after / when one exists (F4→F#4)", () => {
+    const bottom = getPitchRangeForWhiteKeyCount("D3", 10);
+    const top = getPitchRangeForWhiteKeyCount("D#4", 11);
+    const map = getTwoRowKeyToNoteMap(bottom, top);
+
+    // 10 white notes from D3: D3, E3, F3, G3, A3, B3, C4, D4, E4, F4
+    // / → F4, next note = F#4 (black)
+    expect(map["/"]).toBe("F4");
+    expect(map["'"]).toBe("F#4");
+  });
+
+  it("does not map ' when / is E or B (no black note follows)", () => {
+    const bottomC = getPitchRangeForWhiteKeyCount("C3", 10);
+    const bottomG = getPitchRangeForWhiteKeyCount("G3", 10);
+    const top = getPitchRangeForWhiteKeyCount("C4", 11);
+
+    // C3: / → E4, next = F4 (white) → ' unbound
+    expect(getTwoRowKeyToNoteMap(bottomC, top)["'"]).toBeUndefined();
+    // G3: / → B4, next = C5 (white) → ' unbound
+    expect(getTwoRowKeyToNoteMap(bottomG, top)["'"]).toBeUndefined();
   });
 
   it("bottom C3 top D4 — top row first note D4 maps to w not e", () => {
@@ -263,6 +285,29 @@ describe("getTwoRowKeyToNoteMap", () => {
     // D4 has bindings from both rows
     expect(map["."]).toBe("D4");
     expect(map["w"]).toBe("D4");
+
+    // 2 maps to the black note one semitone below w (D4→C#4)
+    expect(map["2"]).toBe("C#4");
+  });
+
+  it("maps 2 to the black note one semitone below w when one exists", () => {
+    // G4 start: w = G4, one semitone below = F#4 (black)
+    const bottom = getPitchRangeForWhiteKeyCount("C3", 11);
+    const top = getPitchRangeForWhiteKeyCount("G4", 11);
+    const map = getTwoRowKeyToNoteMap(bottom, top);
+
+    expect(map["w"]).toBe("G4");
+    expect(map["2"]).toBe("F#4");
+  });
+
+  it("does not map 2 when w is C or F (no black note below)", () => {
+    // C4 start
+    const bottom = getPitchRangeForWhiteKeyCount("C3", 11);
+    const topC = getPitchRangeForWhiteKeyCount("C4", 11);
+    const topF = getPitchRangeForWhiteKeyCount("F4", 11);
+
+    expect(getTwoRowKeyToNoteMap(bottom, topC)["2"]).toBeUndefined();
+    expect(getTwoRowKeyToNoteMap(bottom, topF)["2"]).toBeUndefined();
   });
 });
 
