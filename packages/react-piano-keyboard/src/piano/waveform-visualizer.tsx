@@ -53,7 +53,7 @@ export const WaveformVisualizer = ({
     });
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-theme", "class"],
+      attributeFilter: ["data-theme", "class", "style"],
     });
 
     const draw = () => {
