@@ -1,6 +1,5 @@
 import { Audio, UseMusicNotes } from "../use-piano/use-music-notes";
 import { getControls } from "./controls/get-controls";
-import type { CSSProperties } from "react";
 
 export type ControlSection =
   | "Presets"
@@ -9,18 +8,6 @@ export type ControlSection =
   | "Filter"
   | "LFO"
   | "Analog Clip";
-
-const sectionHeader: CSSProperties = {
-  fontSize: 9,
-  fontWeight: 700,
-  color: "var(--piano-text-muted)",
-  letterSpacing: "0.1em",
-  textTransform: "uppercase",
-  fontFamily: "ui-monospace, monospace",
-  margin: 0,
-  marginBottom: 4,
-  width: "100%",
-};
 
 export const Controls = ({
   set,
@@ -43,38 +30,17 @@ export const Controls = ({
     : allSections;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        // flexDirection: "column",
-        width: "100%",
-        gap: 12,
-        padding: "12px 16px",
-        background: "var(--piano-controls-bg)",
-        borderRadius: "8px 8px 0 0",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="flex w-full gap-3 px-4 py-3 bg-piano-controls-bg rounded-[8px_8px_0_0] box-border">
       {visibleSections.map(({ title, controls }) => (
         <div key={title}>
-          <p style={sectionHeader}>{title}</p>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 8,
-              flexWrap: "wrap",
-            }}
-          >
+          <p className="text-[9px] font-bold text-piano-text-muted tracking-[0.1em] uppercase font-mono m-0 mb-1 w-full">
+            {title}
+          </p>
+          <div className="flex items-start gap-2 flex-wrap">
             {controls.map(({ control }, i) => (
               <div
                 key={`${title}-${i}`}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
-                }}
+                className="flex flex-col items-center gap-1"
               >
                 {control()}
               </div>

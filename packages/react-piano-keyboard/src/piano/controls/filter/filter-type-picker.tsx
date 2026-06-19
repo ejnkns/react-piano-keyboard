@@ -23,62 +23,24 @@ export function FilterTypePicker({
   }, [defaultValue]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 6,
-        padding: 8,
-      }}
-    >
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          color: "var(--piano-text-muted)",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-        }}
-      >
+    <div className="flex flex-col items-center gap-1.5 p-2">
+      <span className="text-[10px] font-semibold text-piano-text-muted tracking-[0.05em] uppercase font-mono">
         Filter
       </span>
-      <div
-        style={{
-          background: "var(--piano-bg-tertiary)",
-          border: "1px solid var(--piano-accent)",
-          borderRadius: 4,
-          padding: 4,
-        }}
-      >
+      <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-1">
         {["lowpass", "highpass", "bandpass", "notch"].map((ft) => {
           const isSelected = selected === ft;
           return (
             <button
               key={ft}
               type="button"
-              className={isSelected ? "selected" : ""}
               onClick={() => {
                 setSelected(ft as BiquadFilterType);
                 onChange?.(ft);
               }}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "3px 6px",
-                margin: 0,
-                border: "none",
-                borderRadius: 2,
-                background: isSelected ? "var(--piano-accent)" : "transparent",
-                color: isSelected
-                  ? "var(--piano-bg-tertiary)"
-                  : "var(--piano-accent)",
-                fontFamily: "ui-monospace, monospace",
-                fontSize: 10,
-                textAlign: "left",
-                cursor: "pointer",
-                lineHeight: "14px",
-              }}
+              className={`block w-full p-[3px_6px] m-0 border-none rounded font-mono text-[10px] text-left cursor-pointer leading-[14px] ${
+                isSelected ? "bg-piano-accent text-piano-bg-tertiary" : "bg-transparent text-piano-accent"
+              }`}
             >
               {ft}
             </button>

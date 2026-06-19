@@ -21,12 +21,12 @@ export function getAnalogClipSection({
 
   return section("Analog Clip", {
     control: () => (
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "center" }}>
+      <div className="flex flex-col gap-1 items-center">
         <AnalogClipVisualizer
           drive={defaultValues?.analogClipDrive ?? 1.5}
           input={defaultValues?.analogClipInput ?? 0.5}
         />
-        <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+        <div className="flex gap-2 items-start">
           <Slider
             name="Drive"
             defaultValue={defaultValues?.analogClipDrive ?? 1.5}

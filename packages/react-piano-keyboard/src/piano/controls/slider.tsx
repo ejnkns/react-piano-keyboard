@@ -1,5 +1,4 @@
 import { useCallback, useRef, useState, useEffect } from "react";
-import "../../styles.css";
 
 export type SliderProps = {
   name: string;
@@ -116,27 +115,15 @@ export const Slider = ({
 
     return (
       <div
-        style={{
-          display: "flex",
-          flexDirection: direction === "horizontal" ? "column" : "row",
-          alignItems: "center",
-          gap: 6,
-          width: svgW,
-          userSelect: "none",
-          WebkitUserSelect: "none",
-        }}
+        className="flex flex-col items-center gap-1.5 select-none"
+        style={{ width: svgW }}
       >
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          style={{
-            cursor: "ew-resize",
-            touchAction: "none",
-            lineHeight: 0,
-            flex: 1,
-          }}
+          className="touch-none leading-[0] flex-1 cursor-[ew-resize]"
         >
           <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
             <defs>
@@ -186,21 +173,7 @@ export const Slider = ({
             />
           </svg>
         </div>
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            fontFamily: "ui-monospace, monospace",
-            color: "var(--piano-accent)",
-            fontVariantNumeric: "tabular-nums",
-            background: "var(--piano-bg-tertiary)",
-            border: "1px solid var(--piano-accent)",
-            borderRadius: 3,
-            padding: "1px 6px",
-            lineHeight: "16px",
-            whiteSpace: "nowrap",
-          }}
-        >
+        <span className="text-[10px] font-bold text-piano-accent font-mono tabular-nums bg-piano-bg-tertiary border border-piano-accent rounded-[3px] p-[1px_6px] leading-[16px] whitespace-nowrap">
           {formatValue(value)}
           {unit ?? ""}
         </span>
@@ -223,28 +196,8 @@ export const Slider = ({
   const thumbCy = fillTop;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 4,
-        userSelect: "none",
-        WebkitUserSelect: "none",
-        width: 64,
-        padding: "8px 0",
-      }}
-    >
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          color: "var(--piano-text-muted)",
-          letterSpacing: "0.05em",
-          textTransform: "uppercase",
-          fontFamily: "ui-monospace, monospace",
-        }}
-      >
+    <div className="flex flex-col items-center gap-1 select-none w-16 py-2">
+      <span className="text-[10px] font-semibold text-piano-text-muted tracking-[0.05em] uppercase font-mono">
         {name}
       </span>
       <div
@@ -252,7 +205,7 @@ export const Slider = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        style={{ cursor: "ns-resize", touchAction: "none", lineHeight: 0 }}
+        className="touch-none leading-[0] cursor-[ns-resize]"
       >
         <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`}>
           <defs>
@@ -302,20 +255,7 @@ export const Slider = ({
           />
         </svg>
       </div>
-      <span
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          fontFamily: "ui-monospace, monospace",
-          color: "var(--piano-accent)",
-          background: "var(--piano-bg-tertiary)",
-          border: "1px solid var(--piano-accent)",
-          borderRadius: 3,
-          padding: "1px 6px",
-          fontVariantNumeric: "tabular-nums",
-          lineHeight: "16px",
-        }}
-      >
+      <span className="text-[10px] font-bold text-piano-accent font-mono tabular-nums bg-piano-bg-tertiary border border-piano-accent rounded-[3px] p-[1px_6px] leading-[16px]">
         {formatValue(value)}
         {unit ?? ""}
       </span>

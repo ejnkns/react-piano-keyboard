@@ -5,6 +5,7 @@ import dts from "vite-plugin-dts";
 export default defineConfig({
   plugins: [dts({ include: ["src"] })],
   build: {
+    cssCodeSplit: false,
     lib: {
       entry: {
         index: resolve(__dirname, "src/react-piano-keyboard.ts"),

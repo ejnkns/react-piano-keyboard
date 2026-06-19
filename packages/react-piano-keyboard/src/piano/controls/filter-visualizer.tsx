@@ -178,14 +178,7 @@ export const FilterVisualizer = ({
   const gridDb = [MIN_DB, MIN_DB / 2, 0, MAX_DB / 2, MAX_DB];
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        alignItems: "center",
-      }}
-    >
+    <div className="flex flex-col gap-0.5 items-center">
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
         <rect
           x={0}

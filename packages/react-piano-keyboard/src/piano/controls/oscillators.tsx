@@ -1,5 +1,4 @@
 import { useState, useEffect, type ReactElement } from "react";
-import "../../styles.css";
 import {
   isOscillatorType,
   Waveforms,
@@ -66,35 +65,11 @@ function WaveformPicker({
 .wave-btn .wave-scroll { animation: scrollWave 1s linear infinite; animation-play-state: paused; }
 .wave-btn:hover .wave-scroll, .wave-btn.selected:hover .wave-scroll { animation-play-state: running; }
 `}</style>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 6,
-          padding: 8,
-        }}
-      >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            color: "var(--piano-text-muted)",
-            letterSpacing: "0.05em",
-            textTransform: "uppercase",
-          }}
-        >
+      <div className="flex flex-col items-center gap-1.5 p-2">
+        <span className="text-[10px] font-semibold text-piano-text-muted tracking-[0.05em] uppercase font-mono">
           {label}
         </span>
-        <div
-          style={{
-            background: "var(--piano-bg-tertiary)",
-            border: "1px solid var(--piano-accent)",
-            borderRadius: 4,
-            padding: 4,
-            boxSizing: "border-box",
-          }}
-        >
+        <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-1 box-border">
           {WAVEFORMS.map((waveform) => {
             const isSelected = selected === waveform;
             return (
@@ -105,38 +80,15 @@ function WaveformPicker({
                   setSelected(waveform);
                   onChange?.(waveform);
                 }}
-                className={"wave-btn" + (isSelected ? " selected" : "")}
-                style={{
-                  display: "block",
-                  width: "100%",
-                  padding: "3px 6px",
-                  margin: 0,
-                  border: "none",
-                  borderRadius: 2,
-                  background: isSelected
-                    ? "var(--piano-accent)"
-                    : "transparent",
-                  color: isSelected
-                    ? "var(--piano-bg-tertiary)"
-                    : "var(--piano-accent)",
-                  fontFamily: "ui-monospace, monospace",
-                  fontSize: 10,
-                  textAlign: "left",
-                  cursor: "pointer",
-                  lineHeight: "14px",
-                  boxSizing: "border-box",
-                }}
+                className={`wave-btn block w-full p-[3px_6px] m-0 border-none rounded font-mono text-[10px] text-left cursor-pointer leading-[14px] box-border ${
+                  isSelected ? "selected bg-piano-accent text-piano-bg-tertiary" : "bg-transparent text-piano-accent"
+                }`}
               >
                 <svg
                   viewBox="0 0 14 10"
                   width={14}
                   height={10}
-                  style={{
-                    verticalAlign: "middle",
-                    marginRight: 2,
-                    display: "inline",
-                    overflow: "hidden",
-                  }}
+                  className="align-middle mr-0.5 inline overflow-hidden"
                 >
                   <g className="wave-scroll">
                     <path
@@ -177,16 +129,7 @@ function WaveformPicker({
 }
 
 function Separator() {
-  return (
-    <div
-      style={{
-        width: 1,
-        alignSelf: "stretch",
-        background: "var(--piano-border)",
-        margin: "0 4px",
-      }}
-    />
-  );
+  return <div className="w-px self-stretch bg-piano-border mx-1" />;
 }
 
 function OscillatorControls({
@@ -201,10 +144,7 @@ function OscillatorControls({
   handlers: Handlers;
 }) {
   return (
-    <div
-      key={`osc-group-${index}`}
-      style={{ display: "flex", alignItems: "flex-start", gap: 8 }}
-    >
+    <div key={`osc-group-${index}`} className="flex items-start gap-2">
       <WaveformPicker
         key={`osc-${index}-wave`}
         label={`${label}`}

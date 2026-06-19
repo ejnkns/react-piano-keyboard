@@ -1,0 +1,191 @@
+@import "tailwindcss/utilities";
+@config "../../../tailwind.config.ts";
+
+:root {
+  --piano-accent: #3b82f6;
+  --piano-accent-off: #555555;
+
+  --piano-bg-primary: #1c1c1c;
+  --piano-bg-secondary: #141414;
+  --piano-bg-tertiary: #0a0a0a;
+  --piano-bg-elevated: #262626;
+
+  --piano-border: #2e2e2e;
+  --piano-border-strong: #3a3a3a;
+
+  --piano-text-primary: #f5f5f5;
+  --piano-text-secondary: #d4d4d4;
+  --piano-text-muted: #8a8a8a;
+
+  --piano-note-white-bg-top: #333333;
+  --piano-note-white-bg-bottom: #2a2a2a;
+  --piano-note-white-border: #444444;
+  --piano-note-white-text: #8a8a8a;
+  --piano-note-white-playing-top: #363636;
+  --piano-note-white-playing-bottom: #303030;
+  --piano-note-white-hover-top: #363636;
+  --piano-note-white-hover-bottom: #303030;
+  --piano-note-black-bg-from: #222222;
+  --piano-note-black-bg-to: #444444;
+  --piano-note-black-text: #999999;
+  --piano-note-black-playing-from: #333333;
+  --piano-note-black-playing-to: #222222;
+  --piano-note-black-hover-from: #333333;
+  --piano-note-black-hover-to: #222222;
+
+  --piano-controls-bg: #1c1c1c;
+  --piano-notes-well-bg: #0a0a14;
+  --piano-waveform-bg: #000000;
+  --piano-waveform-container-bg: var(--piano-bg-primary);
+
+  --power-border: #2e2e2e;
+  --power-bg: #1c1c1c;
+  --power-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --power-bg-active: #262626;
+  --power-shadow-active: 0 0px 1px rgba(0, 0, 0, 0.5) inset;
+}
+
+:root[data-theme="light"] {
+  --piano-bg-primary: #f5f5f5;
+  --piano-bg-secondary: #fafafa;
+  --piano-bg-tertiary: #e8e8e8;
+  --piano-bg-elevated: #ffffff;
+
+  --piano-border: #d4d4d4;
+  --piano-border-strong: #aaaaaa;
+
+  --piano-text-primary: #1a1a1a;
+  --piano-text-secondary: #333333;
+  --piano-text-muted: #888888;
+
+  --piano-note-white-bg-top: #eeeeee;
+  --piano-note-white-bg-bottom: #ffffff;
+  --piano-note-white-border: #bbbbbb;
+  --piano-note-white-text: #666666;
+  --piano-note-white-playing-top: #ffffff;
+  --piano-note-white-playing-bottom: #e9e9e9;
+  --piano-note-white-hover-top: #ffffff;
+  --piano-note-white-hover-bottom: #e9e9e9;
+  --piano-note-black-bg-from: #222222;
+  --piano-note-black-bg-to: #555555;
+  --piano-note-black-text: #cccccc;
+  --piano-note-black-playing-from: #444444;
+  --piano-note-black-playing-to: #222222;
+  --piano-note-black-hover-from: #444444;
+  --piano-note-black-hover-to: #222222;
+
+  --piano-controls-bg: #f5f5f5;
+  --piano-notes-well-bg: #0a0a14;
+  --piano-waveform-bg: #ffffff;
+
+  --power-border: #d4d4d4;
+  --power-bg: #f5f5f5;
+  --power-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --power-bg-active: #eeeeee;
+  --power-shadow-active: 0 0px 1px rgba(0, 0, 0, 0.2) inset;
+}
+
+/* Allow container-level theme override */
+.piano[data-theme="light"] {
+  --piano-bg-primary: #f5f5f5;
+  --piano-bg-secondary: #fafafa;
+  --piano-bg-tertiary: #e8e8e8;
+  --piano-bg-elevated: #ffffff;
+
+  --piano-border: #d4d4d4;
+  --piano-border-strong: #aaaaaa;
+
+  --piano-text-primary: #1a1a1a;
+  --piano-text-secondary: #333333;
+  --piano-text-muted: #888888;
+
+  --piano-note-white-bg-top: #eeeeee;
+  --piano-note-white-bg-bottom: #ffffff;
+  --piano-note-white-border: #bbbbbb;
+  --piano-note-white-text: #666666;
+  --piano-note-white-playing-top: #ffffff;
+  --piano-note-white-playing-bottom: #e9e9e9;
+  --piano-note-white-hover-top: #ffffff;
+  --piano-note-white-hover-bottom: #e9e9e9;
+  --piano-note-black-bg-from: #222222;
+  --piano-note-black-bg-to: #555555;
+  --piano-note-black-text: #cccccc;
+  --piano-note-black-playing-from: #444444;
+  --piano-note-black-playing-to: #222222;
+  --piano-note-black-hover-from: #444444;
+  --piano-note-black-hover-to: #222222;
+
+  --piano-controls-bg: #f5f5f5;
+  --piano-notes-well-bg: #0a0a14;
+  --piano-waveform-bg: #ffffff;
+
+  --power-border: #d4d4d4;
+  --power-bg: #f5f5f5;
+  --power-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --power-bg-active: #eeeeee;
+  --power-shadow-active: 0 0px 1px rgba(0, 0, 0, 0.2) inset;
+}
+
+/* Custom utility classes for piano styles */
+.piano-set:first-child {
+  border-radius: 5px 0 5px 5px;
+}
+
+.piano-set:last-child {
+  border-radius: 0 5px 5px 5px;
+}
+
+.piano-note:first-child {
+  border-radius: 5px 0 5px 5px;
+}
+
+.piano-note:last-child {
+  border-radius: 0 5px 5px 5px;
+}
+
+.piano-offset-black {
+  margin: 0 0 0 -3.57%;
+}
+
+/* Piano key default styles - using hard-coded light colors (ignores theme) */
+.piano-white {
+  border-left-color: #bbb;
+  border-bottom-color: #bbb;
+  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
+  box-shadow:
+    -1px 0 0 rgba(255, 255, 255, 0.8) inset,
+    0 0 5px #ccc inset,
+    0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.piano-black {
+  border-color: #000;
+  background: linear-gradient(45deg, #222 0%, #555 100%);
+  box-shadow:
+    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -5px 2px 3px rgba(0, 0, 0, 0.6) inset,
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Piano key playing state */
+.piano-white.piano-white-playing {
+  border-left-color: #999;
+  border-bottom-color: #999;
+  background: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
+  box-shadow:
+    2px 0 3px rgba(0, 0, 0, 0.1) inset,
+    -5px 5px 20px rgba(0, 0, 0, 0.2) inset,
+    0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.piano-black.piano-black-playing {
+  box-shadow:
+    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to right, #444 0%, #222 100%);
+}
+
+.piano-power-button:active svg {
+  transform: scale(0.95);
+}

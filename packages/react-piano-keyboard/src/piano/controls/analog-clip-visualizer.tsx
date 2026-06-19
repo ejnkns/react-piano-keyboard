@@ -43,14 +43,7 @@ export const AnalogClipVisualizer = ({
   ].join(" ");
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        alignItems: "center",
-      }}
-    >
+    <div className="flex flex-col gap-0.5 items-center">
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
         <rect
           x={0}

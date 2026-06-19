@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import "../styles.css";
 
 const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
   getComputedStyle(el)
@@ -106,21 +105,16 @@ export const WaveformVisualizer = ({
 
   return (
     <div
+      className="min-w-0 overflow-hidden"
       style={{
         width: propWidth ? `${propWidth}px` : "100%",
-        minWidth: 0,
         maxHeight: height,
-        overflow: "hidden",
       }}
     >
       <canvas
         ref={canvasRef}
-        style={{
-          display: "block",
-          width: "100%",
-          height,
-          borderRadius: "0.5rem",
-        }}
+        className="block w-full rounded-lg"
+        style={{ height }}
         height={height}
       />
     </div>
