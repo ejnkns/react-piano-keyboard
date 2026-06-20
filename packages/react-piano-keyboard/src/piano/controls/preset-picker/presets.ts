@@ -1,5 +1,5 @@
-import type { OscillatorConfig } from "../../constants";
-import type { Audio } from "../../use-piano/use-music-notes";
+import type { OscillatorConfig } from "../../../constants";
+import type { Audio } from "../../../use-piano/use-music-notes";
 
 export type Preset = {
   name: string;

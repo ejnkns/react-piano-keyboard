@@ -1,7 +1,26 @@
-import { type ReactElement } from "react";
-import { Slider } from "./slider";
-import { AdsrVisualizer } from "./adsr-visualizer";
-import type { Handlers } from "./shared/handlers";
+import { Slider } from "./shared/slider";
+import { AdsrVisualizer } from "./adsr-envelope/adsr-visualizer";
+import type { UseMusicNotes } from "../../use-piano/use-music-notes";
+
+export type AdsrHandlers = {
+  gain: (v: number) => void;
+  attack: (v: number) => void;
+  decay: (v: number) => void;
+  sustain: (v: number) => void;
+  release: (v: number) => void;
+  adsrEnabled: (v: boolean) => void;
+};
+
+export function getAdsrHandlers(set: UseMusicNotes["set"]): AdsrHandlers {
+  return {
+    gain: (v: number) => set({ gain: v }),
+    attack: (v: number) => set({ attack: v }),
+    decay: (v: number) => set({ decay: v }),
+    sustain: (v: number) => set({ sustain: v }),
+    release: (v: number) => set({ release: v }),
+    adsrEnabled: (v: boolean) => set({ adsrEnabled: v }),
+  };
+}
 
 export function getAdsrEnvelopeSection({
   defaultValues,
@@ -15,8 +34,9 @@ export function getAdsrEnvelopeSection({
     decay?: number;
     sustain?: number;
     release?: number;
+    adsrEnabled?: boolean;
   };
-  handlers: Handlers;
+  handlers: AdsrHandlers;
   envelopeActivity?: Record<
     number,
     {
@@ -27,14 +47,14 @@ export function getAdsrEnvelopeSection({
     }
   >;
   noteRange?: { min: string; max: string };
-}): { title: string; controls: { control: () => ReactElement }[] } {
+}) {
   return {
-    title: "ADSR Envelope",
-    controls: [
-      {
-        control: () => (
+    title: "ADSR Envelope" as const,
+    onToggle: handlers.adsrEnabled,
+    group: (
+      <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-2">
+        <div className="flex items-start gap-2 flex-wrap justify-between">
           <Slider
-            key="gain"
             name="Gain"
             defaultValue={defaultValues?.gain}
             min={0}
@@ -42,12 +62,7 @@ export function getAdsrEnvelopeSection({
             step={0.05}
             onChange={handlers.gain}
           />
-        ),
-      },
-      {
-        control: () => (
           <Slider
-            key="attack"
             name="Attack"
             defaultValue={defaultValues?.attack}
             min={0.01}
@@ -56,12 +71,7 @@ export function getAdsrEnvelopeSection({
             unit="s"
             onChange={handlers.attack}
           />
-        ),
-      },
-      {
-        control: () => (
           <Slider
-            key="decay"
             name="Decay"
             defaultValue={defaultValues?.decay}
             min={0.01}
@@ -70,12 +80,7 @@ export function getAdsrEnvelopeSection({
             unit="s"
             onChange={handlers.decay}
           />
-        ),
-      },
-      {
-        control: () => (
           <Slider
-            key="sustain"
             name="Sustain"
             defaultValue={defaultValues?.sustain}
             min={0}
@@ -83,12 +88,7 @@ export function getAdsrEnvelopeSection({
             step={0.01}
             onChange={handlers.sustain}
           />
-        ),
-      },
-      {
-        control: () => (
           <Slider
-            key="release"
             name="Release"
             defaultValue={defaultValues?.release}
             min={0.01}
@@ -97,22 +97,17 @@ export function getAdsrEnvelopeSection({
             unit="s"
             onChange={handlers.release}
           />
-        ),
-      },
-      {
-        control: () => (
-          <AdsrVisualizer
-            key="adsr-viz"
-            gain={defaultValues?.gain ?? 1}
-            attack={defaultValues?.attack ?? 0.01}
-            decay={defaultValues?.decay ?? 0.01}
-            sustain={defaultValues?.sustain ?? 0.5}
-            release={defaultValues?.release ?? 0.4}
-            activity={envelopeActivity}
-            noteRange={noteRange}
-          />
-        ),
-      },
-    ],
+        </div>
+        <AdsrVisualizer
+          gain={defaultValues?.gain ?? 1}
+          attack={defaultValues?.attack ?? 0.01}
+          decay={defaultValues?.decay ?? 0.01}
+          sustain={defaultValues?.sustain ?? 0.5}
+          release={defaultValues?.release ?? 0.4}
+          activity={envelopeActivity}
+          noteRange={noteRange}
+        />
+      </div>
+    ),
   };
 }

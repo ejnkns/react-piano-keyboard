@@ -51,6 +51,10 @@ export namespace Audio {
     lfoWaveform?: OscillatorType;
     analogClipDrive?: number;
     analogClipInput?: number;
+    adsrEnabled?: boolean;
+    filterEnabled?: boolean;
+    lfoEnabled?: boolean;
+    analogClipEnabled?: boolean;
   };
 }
 
@@ -88,6 +92,10 @@ const UI_INITIAL_STATE: Required<Audio.SetOptions> = {
   lfoWaveform: DEFAULT_LFO_WAVEFORM,
   analogClipDrive: DEFAULT_ANALOG_CLIP_DRIVE,
   analogClipInput: DEFAULT_ANALOG_CLIP_INPUT,
+  adsrEnabled: true,
+  filterEnabled: true,
+  lfoEnabled: true,
+  analogClipEnabled: true,
 };
 
 export const useMusicNotes = ({
@@ -199,24 +207,32 @@ export const useMusicNotes = ({
         const opts = optsRef.current;
         const freq = pitchToFrequency(note);
 
+        const filterCutoff = opts.filterEnabled ? opts.filterCutoff : 22050;
+        const filterResonance = opts.filterEnabled ? opts.filterResonance : 0.1;
+        const gain = opts.adsrEnabled ? opts.gain : 1;
+        const attack = opts.adsrEnabled ? opts.attack : 0.01;
+        const decay = opts.adsrEnabled ? opts.decay : 0.01;
+        const sustain = opts.adsrEnabled ? opts.sustain : 1;
+
         const nodes = engine.createVoiceNodes(
           ctx,
           freq,
           opts.oscillatorCount,
           opts.oscillators,
-          opts.filterCutoff,
-          opts.filterResonance,
+          filterCutoff,
+          filterResonance,
           opts.filterType,
-          opts.gain,
-          opts.attack,
-          opts.decay,
-          opts.sustain,
+          gain,
+          attack,
+          decay,
+          sustain,
         );
 
         const clipNodes = engine.ensureAnalogClip(ctx, analyserNode, {
           drive: opts.analogClipDrive,
           input: opts.analogClipInput,
         });
+        engine.updateAnalogClipEnabled(opts.analogClipEnabled, opts.analogClipDrive);
         nodes.tremoloGain.connect(clipNodes.input);
 
         const voiceId = ++voiceIdCounter.current;
@@ -244,7 +260,7 @@ export const useMusicNotes = ({
           rate: opts.lfoRate,
           depth: opts.lfoDepth,
         });
-        engine.connectLfoToVoice(voice, opts.lfoTarget);
+        engine.connectLfoToVoice(voice, opts.lfoEnabled ? opts.lfoTarget : "none");
 
         setPlayingNotes((prev) =>
           prev.includes(note) ? prev : [...prev, note],
@@ -402,13 +418,46 @@ export const useMusicNotes = ({
         voices.forEach(({ filterNode }) => filterNode.type = options.filterType!);
       }
 
-      // --- LFO & Analog Clip ---
+      // --- Filter bypass ---
+      if (options.filterEnabled !== undefined && options.filterEnabled !== prev.filterEnabled) {
+        const fc = options.filterEnabled ? (options.filterCutoff ?? prev.filterCutoff) : 22050;
+        const fr = options.filterEnabled ? (options.filterResonance ?? prev.filterResonance) : 0.1;
+        voices.forEach(({ filterNode }) => {
+          filterNode.frequency.setTargetAtTime(fc, time, T);
+          filterNode.Q.setTargetAtTime(fr, time, T);
+        });
+      }
+
+      // --- ADSR bypass ---
+      if (options.adsrEnabled !== undefined && options.adsrEnabled !== prev.adsrEnabled) {
+        if (!options.adsrEnabled) {
+          voices.forEach(({ envGain }) => {
+            envGain.gain.cancelScheduledValues(time);
+            envGain.gain.setValueAtTime(envGain.gain.value, time);
+            envGain.gain.linearRampToValueAtTime(1, time + T);
+          });
+        }
+      }
+
+      // --- LFO ---
       if (options.lfoRate !== undefined) engine.updateLfoRate(options.lfoRate);
       if (options.lfoDepth !== undefined) engine.updateLfoDepth(options.lfoDepth);
       if (options.lfoWaveform !== undefined) engine.updateLfoWaveform(options.lfoWaveform);
       if (options.lfoTarget !== undefined) engine.relinkLfo(options.lfoTarget, voices);
+
+      // --- LFO bypass ---
+      if (options.lfoEnabled !== undefined && options.lfoEnabled !== prev.lfoEnabled) {
+        engine.relinkLfo(options.lfoEnabled ? optsRef.current.lfoTarget : "none", voices);
+      }
+
+      // --- Analog Clip ---
       if (options.analogClipDrive !== undefined) engine.updateAnalogClipDrive(options.analogClipDrive);
       if (options.analogClipInput !== undefined) engine.updateAnalogClipInput(options.analogClipInput);
+
+      // --- Analog Clip bypass ---
+      if (options.analogClipEnabled !== undefined && options.analogClipEnabled !== prev.analogClipEnabled) {
+        engine.updateAnalogClipEnabled(options.analogClipEnabled, optsRef.current.analogClipDrive);
+      }
     },
     [engine, getAudioContext],
   );

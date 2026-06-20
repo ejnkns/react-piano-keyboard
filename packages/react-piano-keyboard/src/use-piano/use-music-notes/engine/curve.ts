@@ -8,3 +8,13 @@ export function createAnalogClipCurve(drive: number, n_samples = 2048) {
   }
   return curve;
 }
+
+function createIdentityCurve(n_samples = 2048) {
+  const curve = new Float32Array(n_samples);
+  for (let i = 0; i < n_samples; i++) {
+    curve[i] = (i * 2) / (n_samples - 1) - 1;
+  }
+  return curve;
+}
+
+export const IDENTITY_CURVE = createIdentityCurve();

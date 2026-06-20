@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Slider } from "./slider";
 
 const FS = 44100;
 const POINTS = 120;
@@ -12,7 +11,6 @@ type FilterVisualizerProps = {
   filterType: BiquadFilterType;
   cutoff: number;
   resonance: number;
-  onCutoffChange?: (v: number) => void;
 };
 
 function biquadCoeffs(
@@ -137,7 +135,6 @@ export const FilterVisualizer = ({
   filterType,
   cutoff,
   resonance,
-  onCutoffChange,
 }: FilterVisualizerProps) => {
   const w = 220;
   const h = 90;
@@ -178,101 +175,87 @@ export const FilterVisualizer = ({
   const gridDb = [MIN_DB, MIN_DB / 2, 0, MAX_DB / 2, MAX_DB];
 
   return (
-    <div className="flex flex-col gap-0.5 items-center">
-      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-        <rect
-          x={0}
-          y={0}
-          width={w}
-          height={h}
-          rx={4}
-          fill="var(--piano-bg-tertiary)"
-        />
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+      <rect
+        x={0}
+        y={0}
+        width={w}
+        height={h}
+        rx={4}
+        fill="var(--piano-bg-tertiary)"
+      />
 
+      <line
+        x1={pad.l}
+        y1={zeroDbY}
+        x2={pad.l + pw}
+        y2={zeroDbY}
+        stroke="var(--piano-border-strong)"
+        strokeWidth={0.5}
+        opacity={0.3}
+        strokeDasharray="2,2"
+      />
+
+      {gridFreqs.map((f) => (
         <line
-          x1={pad.l}
-          y1={zeroDbY}
-          x2={pad.l + pw}
-          y2={zeroDbY}
+          key={`g-${f}`}
+          x1={toX(f)}
+          y1={pad.t}
+          x2={toX(f)}
+          y2={pad.t + ph}
           stroke="var(--piano-border-strong)"
           strokeWidth={0.5}
-          opacity={0.3}
-          strokeDasharray="2,2"
+          opacity={0.15}
         />
+      ))}
 
-        {gridFreqs.map((f) => (
-          <line
-            key={`g-${f}`}
-            x1={toX(f)}
-            y1={pad.t}
-            x2={toX(f)}
-            y2={pad.t + ph}
-            stroke="var(--piano-border-strong)"
-            strokeWidth={0.5}
-            opacity={0.15}
-          />
-        ))}
+      {[100, 1000, 10000].map((f) => (
+        <text
+          key={`l-${f}`}
+          x={toX(f)}
+          y={pad.t + ph + 10}
+          textAnchor="middle"
+          fill="var(--piano-text-muted)"
+          fontSize={6}
+          fontFamily="ui-monospace, monospace"
+        >
+          {f >= 1000 ? `${(f / 1000).toFixed(0)}k` : `${f}`}
+        </text>
+      ))}
 
-        {[100, 1000, 10000].map((f) => (
-          <text
-            key={`l-${f}`}
-            x={toX(f)}
-            y={pad.t + ph + 10}
-            textAnchor="middle"
-            fill="var(--piano-text-muted)"
-            fontSize={6}
-            fontFamily="ui-monospace, monospace"
-          >
-            {f >= 1000 ? `${(f / 1000).toFixed(0)}k` : `${f}`}
-          </text>
-        ))}
+      {gridDb.map((db) => (
+        <text
+          key={`db-${db}`}
+          x={pad.l - 3}
+          y={toY(db) + 2}
+          textAnchor="end"
+          fill="var(--piano-text-muted)"
+          fontSize={6}
+          fontFamily="ui-monospace, monospace"
+        >
+          {db === 0 ? "0" : `${db > 0 ? "+" : ""}${db}`}
+        </text>
+      ))}
 
-        {gridDb.map((db) => (
-          <text
-            key={`db-${db}`}
-            x={pad.l - 3}
-            y={toY(db) + 2}
-            textAnchor="end"
-            fill="var(--piano-text-muted)"
-            fontSize={6}
-            fontFamily="ui-monospace, monospace"
-          >
-            {db === 0 ? "0" : `${db > 0 ? "+" : ""}${db}`}
-          </text>
-        ))}
-
-        <line
-          x1={cutoffX}
-          y1={cutoffY0}
-          x2={cutoffX}
-          y2={cutoffY1}
-          stroke="var(--piano-accent)"
-          strokeWidth={0.5}
-          opacity={0.35}
-          strokeDasharray="3,2"
-        />
-
-        <polyline
-          points={curve}
-          fill="none"
-          stroke="var(--piano-accent)"
-          strokeWidth={1.5}
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      </svg>
-
-      <Slider
-        name="cutoff"
-        defaultValue={cutoff}
-        min={20}
-        max={20000}
-        step={1}
-        scale="log"
-        direction="horizontal"
-        fillWidth={w}
-        onChange={onCutoffChange}
+      <line
+        x1={cutoffX}
+        y1={cutoffY0}
+        x2={cutoffX}
+        y2={cutoffY1}
+        stroke="var(--piano-accent)"
+        strokeWidth={0.5}
+        opacity={0.35}
+        strokeDasharray="3,2"
       />
-    </div>
+
+      <polyline
+        points={curve}
+        fill="none"
+        stroke="var(--piano-accent)"
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 };

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useMemo } from "react";
-import { pitchToFrequency } from "../../pitches";
+import { pitchToFrequency } from "../../../pitches";
 
 const fmt = (v: number) => v.toFixed(2) + "s";
 

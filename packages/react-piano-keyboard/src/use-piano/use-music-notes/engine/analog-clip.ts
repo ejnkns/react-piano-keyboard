@@ -1,5 +1,5 @@
 import { ANALOG_CLIP_OVERSAMPLE } from "../../../constants";
-import { createAnalogClipCurve } from "./curve";
+import { createAnalogClipCurve, IDENTITY_CURVE } from "./curve";
 
 export type AnalogClipState = {
   input: GainNode;
@@ -39,6 +39,15 @@ export function updateAnalogClipDrive(ref: AnalogClipRef, drive: number) {
 export function updateAnalogClipInput(ref: AnalogClipRef, input: number) {
   if (!ref.current) return;
   ref.current.input.gain.value = input;
+}
+
+export function updateAnalogClipEnabled(ref: AnalogClipRef, enabled: boolean, drive: number) {
+  if (!ref.current) return;
+  if (enabled) {
+    ref.current.shaper.curve = createAnalogClipCurve(drive) as unknown as Float32Array<ArrayBuffer>;
+  } else {
+    ref.current.shaper.curve = IDENTITY_CURVE as unknown as Float32Array<ArrayBuffer>;
+  }
 }
 
 export function disconnectAnalogClip(ref: AnalogClipRef) {

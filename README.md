@@ -18,7 +18,7 @@ import { Piano } from "react-piano-keyboard";
 <Piano />;
 ```
 
-The `<Piano>` component is uncontrolled by default. It creates its own `AudioContext` and manages note state, mapping, and keyboard input internally. Set `controls` or `waveform` to show the control panel and waveform visualizer.
+The `<Piano>` component is uncontrolled by default. It creates its own `AudioContext` and manages note state, mapping, and keyboard input internally. Set `controls` or `waveform` to show the control panel and waveform visualizer. Each section (Filter, ADSR, LFO, Analog Clip) has an on/off toggle to bypass its processing.
 
 ### With custom hook (controlled)
 
@@ -62,7 +62,7 @@ import { Piano } from "react-piano-keyboard";
   rows={1 | 2}                             // default: 1
   start={"C3" | { bottom: "C3", top?: "C4" }}  // default: "C3"
   end={"C5"}                               // optional, only for rows=1
-  controls={true | { onClose, defaultValues }}
+  controls={true | { onClose, defaultValues, sections }}
   waveform={true | { width, height, strokeColor, backgroundColor }}
 />
 ```
@@ -82,13 +82,13 @@ import { Piano } from "react-piano-keyboard";
 
 - **`<Piano>`** — Uncontrolled piano component with optional controls panel and waveform visualizer.
 - **`<PianoNotes>`** — Renders piano keys (white/black notes) with mouse/touch interaction. Used by `<Piano>` internally. Accepts `notes`, `audio`, `mapping`, `whiteCount`.
-- **`<Controls>`** — Gain, attack, decay knobs and waveform picker.
+- **`<Controls>`** — Sections panel with oscillators (waveform, gain, detune, octave, pan per-oscillator), ADSR envelope, filter, LFO, analog clip, and presets. Each section (except Presets/Oscillators) has an on/off toggle that bypasses its processing. Each section has a live SVG visualizer. Use `sections` prop to show a subset.
 - **`<WaveformVisualizer>`** — Canvas-based oscilloscope display.
 
 ## Hooks
 
 - **`usePiano(options?)`** — Main hook. Returns `{ notes, allNotes, rowNotes, defaultMap, audio, mapping, inputProps, rowConfigs }`.
-- **`useMusicNotes(options?)`** — Core synth hook. Manages `AudioContext`, oscillators, gain, ADSR envelope. Returns `{ start, stop, stopAll, set, state, controlValues, playingNotes }`.
+- **`useMusicNotes(options?)`** — Core synth hook. Manages `AudioContext`, oscillators, gain, ADSR envelope, filter, LFO, analog clip. Returns `{ start, stop, stopAll, set, state, controlValues, playingNotes, envelopeActivity }`. The `SetOptions` type includes `*Enabled` flags (`filterEnabled`, `adsrEnabled`, `lfoEnabled`, `analogClipEnabled`) to bypass each processing stage.
 - **`useAudioContext()`** — Singleton `AudioContext` manager.
 - **`useKeyMapping(notes)`** — Manages computer-key-to-note mapping with edit mode. Returns `{ keyMap, editMode, toggleEditMode, selectNote, assignKey, resetToDefaults }`.
 - **`useKeyboardInput(options)`** — Computer keyboard event handler. Returns `{ onKeyDown, onKeyUp }`.

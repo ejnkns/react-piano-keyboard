@@ -3,6 +3,7 @@ import {
   ensureAnalogClip,
   updateAnalogClipDrive,
   updateAnalogClipInput,
+  updateAnalogClipEnabled,
   disconnectAnalogClip,
   type AnalogClipRef,
 } from "./engine/analog-clip";
@@ -43,6 +44,9 @@ export function createAudioEngine() {
 
     updateAnalogClipInput: (input: number) =>
       updateAnalogClipInput(analogClipRef, input),
+
+    updateAnalogClipEnabled: (enabled: boolean, drive: number) =>
+      updateAnalogClipEnabled(analogClipRef, enabled, drive),
 
     disconnectAnalogClip: () => disconnectAnalogClip(analogClipRef),
 
