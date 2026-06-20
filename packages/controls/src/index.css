@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-piano-accent: var(--piano-accent, #3b82f6);
+  --color-piano-bg-tertiary: var(--piano-bg-tertiary, #0a0a0a);
+  --color-piano-bg-elevated: var(--piano-bg-elevated, #262626);
+  --color-piano-border: var(--piano-border, #2e2e2e);
+  --color-piano-border-strong: var(--piano-border-strong, #3a3a3a);
+  --color-piano-text-muted: var(--piano-text-muted, #8a8a8a);
+  --color-piano-controls-bg: var(--piano-controls-bg, #1c1c1c);
+  --color-piano-waveform-bg: var(--piano-waveform-bg, #000000);
+}
+
+@keyframes scrollWave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-14px);
+  }
+}

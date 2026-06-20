@@ -1,4 +1,4 @@
-import { ANALOG_CLIP_OVERSAMPLE } from "../../../constants";
+import { ANALOG_CLIP_OVERSAMPLE } from "@react-piano-keyboard/shared";
 import { createAnalogClipCurve, IDENTITY_CURVE } from "./curve";
 
 export type AnalogClipState = {

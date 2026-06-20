@@ -1,14 +1,11 @@
-export * from "./constants";
-export * from "./pitches";
 export { useMusicNotes } from "./use-piano/use-music-notes";
 export type { UseMusicNotes, Audio } from "./use-piano/use-music-notes";
 export { usePiano } from "./use-piano";
 export type { UsePianoOptions } from "./use-piano";
 export { useKeyMapping } from "./use-piano/use-key-mapping";
-export { useKeyboardInput } from "./use-piano/use-keyboard-input";
+export { useKeyboardInput } from "@react-piano-keyboard/piano-keyboard";
 export { useAudioContext } from "./use-audio-context";
 export { Piano } from "./piano";
-export { PianoNotes } from "./piano/piano-notes";
-export { Controls, type ControlSection } from "./piano/controls";
-export { WaveformVisualizer } from "./piano/waveform-visualizer";
-export type { PianoNotesProps } from "./piano/piano-notes";
+export { PianoNotes, type PianoNotesProps } from "@react-piano-keyboard/piano-keyboard";
+export { Controls, type ControlSection, WaveformVisualizer } from "@react-piano-keyboard/controls";
+export * from "@react-piano-keyboard/shared";

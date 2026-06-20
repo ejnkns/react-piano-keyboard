@@ -1,5 +1,3 @@
 export { Piano } from "./piano";
-export { PianoNotes } from "./piano/piano-notes";
-export type { PianoNotesProps } from "./piano/piano-notes";
-export { Controls, type ControlSection } from "./piano/controls";
-export { WaveformVisualizer } from "./piano/waveform-visualizer";
+export { PianoNotes, type PianoNotesProps } from "@react-piano-keyboard/piano-keyboard";
+export { Controls, type ControlSection, WaveformVisualizer } from "@react-piano-keyboard/controls";

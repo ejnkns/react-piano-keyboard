@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Pitches } from "../pitches";
-import { getKeyToNoteMap } from "./piano-utils";
+import { Pitches, getKeyToNoteMap } from "@react-piano-keyboard/shared";
 
 export const useKeyMapping = (notes: Pitches.Pitch[], initialMap?: Record<string, Pitches.Pitch>) => {
   const defaultMap = useMemo(() => initialMap ?? getKeyToNoteMap(notes), [notes, initialMap]);

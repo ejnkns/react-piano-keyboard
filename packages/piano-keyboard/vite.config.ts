@@ -7,14 +7,9 @@ export default defineConfig({
   build: {
     cssCodeSplit: false,
     lib: {
-      entry: {
-        index: resolve(__dirname, "src/react-piano-keyboard.ts"),
-        hooks: resolve(__dirname, "src/hooks.ts"),
-        components: resolve(__dirname, "src/components.ts"),
-        types: resolve(__dirname, "src/types.ts"),
-      },
+      entry: resolve(__dirname, "src/index.ts"),
       formats: ["es", "cjs"],
-      fileName: (format, name) => `${name}.${format === "es" ? "mjs" : "cjs"}`,
+      fileName: (format) => `index.${format === "es" ? "mjs" : "cjs"}`,
     },
     rollupOptions: {
       external: ["react", "react-dom"],

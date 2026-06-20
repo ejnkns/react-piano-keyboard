@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect } from "react";
 import {
   Piano,
   PianoNotes,
-  Controls,
   WaveformVisualizer,
   usePiano,
   useAudioContext,
@@ -300,14 +299,17 @@ const CONTROL_SECTIONS: ControlSection[] = [
 
 function InteractiveExample() {
   const [rows, setRows] = useState<1 | 2>(2);
-  const [startNote, setStartNote] = useState("C");
-  const [startOctave, setStartOctave] = useState(3);
+  // rows=2
   const [startBottomNote, setStartBottomNote] = useState("C");
   const [startBottomOctave, setStartBottomOctave] = useState(3);
   const [startTopNote, setStartTopNote] = useState("C");
   const [startTopOctave, setStartTopOctave] = useState(4);
-  const [endNote, setEndNote] = useState("C");
+  // rows=1
+  const [startNote, setStartNote] = useState("C");
+  const [startOctave, setStartOctave] = useState(2);
+  const [endNote, setEndNote] = useState("D");
   const [endOctave, setEndOctave] = useState(5);
+
   const [showControls, setShowControls] = useState(true);
   const [showWaveform, setShowWaveform] = useState(true);
   const [sectionVis, setSectionVis] = useState<Record<string, boolean>>(() =>
@@ -530,9 +532,7 @@ return (
       <div style={{ marginTop: 12 }}>
         <WaveformVisualizer analyserNode={analyser} height={120} />
       </div>
-      <div
-        style={{ minWidth: "320px", marginTop: 12 }}
-      >
+      <div style={{ minWidth: "320px", marginTop: 12 }}>
         <div
           style={{
             display: "flex",
@@ -644,7 +644,14 @@ export default function App() {
               margin: 0,
             }}
           >
-            react-piano-keyboard
+            <a
+              href="https://github.com/ejnkns/react-piano-keyboard"
+              className="hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              react-piano-keyboard
+            </a>
           </h1>
           <div
             style={{

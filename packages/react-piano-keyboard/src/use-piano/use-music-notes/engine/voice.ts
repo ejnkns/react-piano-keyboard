@@ -1,5 +1,4 @@
-import { type OscillatorConfig } from "../../../constants";
-import type { Pitches } from "../../../pitches";
+import { type OscillatorConfig, type Pitches } from "@react-piano-keyboard/shared";
 
 export type OscillatorVoice = {
   osc: OscillatorNode;

@@ -1,4 +1,8 @@
+@import "@react-piano-keyboard/piano-keyboard/styles.css";
+@import "@react-piano-keyboard/controls/styles.css";
 @import "tailwindcss";
+@source "../piano-keyboard/src";
+@source "../controls/src";
 
 @theme {
   --color-piano-accent: var(--piano-accent);
@@ -17,7 +21,9 @@
   --color-piano-note-white-border: var(--piano-note-white-border);
   --color-piano-note-white-text: var(--piano-note-white-text);
   --color-piano-note-white-playing-top: var(--piano-note-white-playing-top);
-  --color-piano-note-white-playing-bottom: var(--piano-note-white-playing-bottom);
+  --color-piano-note-white-playing-bottom: var(
+    --piano-note-white-playing-bottom
+  );
   --color-piano-note-white-hover-top: var(--piano-note-white-hover-top);
   --color-piano-note-white-hover-bottom: var(--piano-note-white-hover-bottom);
   --color-piano-note-black-bg-from: var(--piano-note-black-bg-from);
@@ -39,8 +45,16 @@
 
   --shadow-piano-case: 0 5px 15px rgba(0, 0, 0, 0.5);
 
-  --background-image-piano-conflict-white: linear-gradient(to bottom, #fca5a5 0%, #f87171 100%);
-  --background-image-piano-conflict-black: linear-gradient(45deg, #7f1d1d 0%, #dc2626 100%);
+  --background-image-piano-conflict-white: linear-gradient(
+    to bottom,
+    #fca5a5 0%,
+    #f87171 100%
+  );
+  --background-image-piano-conflict-black: linear-gradient(
+    45deg,
+    #7f1d1d 0%,
+    #dc2626 100%
+  );
 }
 
 :root {
@@ -77,7 +91,7 @@
   --piano-note-black-hover-to: #222222;
 
   --piano-controls-bg: #1c1c1c;
-  --piano-notes-well-bg: #0a0a14;
+  --piano-notes-well-bg: #1c1c1c;
   --piano-waveform-bg: #000000;
   --piano-waveform-container-bg: var(--piano-bg-primary);
 
@@ -117,7 +131,7 @@
   --piano-note-black-hover-to: #222222;
 
   --piano-controls-bg: #f5f5f5;
-  --piano-notes-well-bg: #0a0a14;
+  --piano-notes-well-bg: #f5f5f5;
   --piano-waveform-bg: #ffffff;
 
   --power-border: #d4d4d4;
@@ -168,75 +182,6 @@
   --power-shadow-active: 0 0px 1px rgba(0, 0, 0, 0.2) inset;
 }
 
-/* Custom utility classes for piano styles */
-.piano-set:first-child {
-  border-radius: 5px 0 5px 5px;
-}
-
-.piano-set:last-child {
-  border-radius: 0 5px 5px 5px;
-}
-
-.piano-note:first-child {
-  border-radius: 5px 0 5px 5px;
-}
-
-.piano-note:last-child {
-  border-radius: 0 5px 5px 5px;
-}
-
-.piano-offset-black {
-  margin: 0 0 0 -3.57%;
-}
-
-/* Piano key default styles - using hard-coded light colors (ignores theme) */
-.piano-white {
-  border-left-color: #bbb;
-  border-bottom-color: #bbb;
-  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
-  box-shadow:
-    -1px 0 0 rgba(255, 255, 255, 0.8) inset,
-    0 0 5px #ccc inset,
-    0 0 3px rgba(0, 0, 0, 0.2);
-}
-
-.piano-black {
-  border-color: #000;
-  background: linear-gradient(45deg, #222 0%, #555 100%);
-  box-shadow:
-    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
-    0 -5px 2px 3px rgba(0, 0, 0, 0.6) inset,
-    0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Piano key playing state */
-.piano-white.piano-white-playing {
-  border-left-color: #999;
-  border-bottom-color: #999;
-  background: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
-  box-shadow:
-    2px 0 3px rgba(0, 0, 0, 0.1) inset,
-    -5px 5px 20px rgba(0, 0, 0, 0.2) inset,
-    0 0 3px rgba(0, 0, 0, 0.2);
-}
-
-.piano-black.piano-black-playing {
-  box-shadow:
-    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
-    0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset,
-    0 1px 2px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(to right, #444 0%, #222 100%);
-}
-
 .piano-power-button:active svg {
   transform: scale(0.95);
-}
-
-@keyframes scrollWave {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-14px);
-  }
 }

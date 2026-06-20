@@ -1,11 +1,18 @@
 import { useMemo, useState, useEffect } from "react";
 import "./index.css";
 import { usePiano } from "./use-piano";
-import { PianoNotes } from "./piano/piano-notes";
-import { Controls, type ControlSection } from "./piano/controls";
-import { WaveformVisualizer } from "./piano/waveform-visualizer";
-import { Pitches } from "./pitches";
-import { LfoTarget, OscillatorConfig } from "./constants";
+import { PianoNotes } from "@react-piano-keyboard/piano-keyboard";
+import {
+  Controls,
+  type ControlSection,
+  type SetFn,
+  WaveformVisualizer,
+} from "@react-piano-keyboard/controls";
+import {
+  Pitches,
+  LfoTarget,
+  OscillatorConfig,
+} from "@react-piano-keyboard/shared";
 import { Audio } from "./use-piano/use-music-notes";
 
 export namespace Piano {
@@ -184,6 +191,7 @@ export function Piano({
           ? {}
           : ({
               "--piano-accent": "var(--piano-accent-off)",
+              "--color-piano-accent": "var(--piano-accent-off)",
             } as React.CSSProperties)),
       }}
     >
@@ -225,7 +233,7 @@ export function Piano({
         </div>
         {(showControls || showWaveform) && showControls && (
           <Controls
-            set={audio.set}
+            set={audio.set as SetFn}
             defaultValues={audio.controlValues}
             envelopeActivity={audio.envelopeActivity}
             noteRange={{

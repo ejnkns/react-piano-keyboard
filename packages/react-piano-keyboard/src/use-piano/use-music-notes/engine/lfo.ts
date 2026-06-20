@@ -1,4 +1,4 @@
-import { type LfoTarget } from "../../../constants";
+import { type LfoTarget } from "@react-piano-keyboard/shared";
 
 export type LfoState = { osc: OscillatorNode; depth: GainNode };
 export type LfoRef = { current: LfoState | null };

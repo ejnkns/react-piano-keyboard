@@ -1,16 +1,21 @@
 import { useMemo } from "react";
 import { useMusicNotes } from "./use-piano/use-music-notes";
 import { useKeyMapping } from "./use-piano/use-key-mapping";
-import { useKeyboardInput } from "./use-piano/use-keyboard-input";
-import { getPitchRange, pitchToIndex, indexToPitch } from "./pitches";
+import { useKeyboardInput } from "@react-piano-keyboard/piano-keyboard";
 import {
+  Pitches,
+  OctaveRows,
   getKeyToNoteMap,
   getTwoRowKeyToNoteMap,
   getPitchRangeForWhiteKeyCount,
-} from "./use-piano/piano-utils";
-import { OctaveRows } from "./keyboard-layout";
-import { Pitches } from "./pitches";
-import { OscillatorConfig, DEFAULT_OSCILLATOR_COUNT, DEFAULT_OSCILLATOR_CONFIG, LfoTarget } from "./constants";
+  getPitchRange,
+  pitchToIndex,
+  indexToPitch,
+  OscillatorConfig,
+  DEFAULT_OSCILLATOR_COUNT,
+  DEFAULT_OSCILLATOR_CONFIG,
+  LfoTarget,
+} from "@react-piano-keyboard/shared";
 
 export type UsePianoOptions = {
   rows?: 1 | 2;

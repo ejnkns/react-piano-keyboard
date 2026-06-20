@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useReducer, useState, useRef, useCallback } from "react";
 import {
+  Pitches,
+  pitchToFrequency,
   DEFAULT_OSCILLATOR_CONFIG,
   DEFAULT_OSCILLATOR_COUNT,
   type OscillatorConfig,
@@ -21,8 +23,7 @@ import {
   DEFAULT_ANALOG_CLIP_DRIVE,
   DEFAULT_ANALOG_CLIP_INPUT,
   type LfoTarget,
-} from "../constants";
-import { Pitches, pitchToFrequency } from "../pitches";
+} from "@react-piano-keyboard/shared";
 import { createAudioEngine, type ActiveVoice } from "./use-music-notes/engine";
 
 export namespace Audio {

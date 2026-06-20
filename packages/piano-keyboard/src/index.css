@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  --color-piano-keyboard-accent: var(--piano-keyboard-accent);
+  --color-piano-keyboard-text-muted: var(--piano-keyboard-text-muted);
+
+  --shadow-piano-keyboard-case: 0 5px 15px rgba(0, 0, 0, 0.5);
+
+  --background-image-piano-keyboard-conflict-white: linear-gradient(
+    to bottom,
+    #fca5a5 0%,
+    #f87171 100%
+  );
+  --background-image-piano-keyboard-conflict-black: linear-gradient(
+    45deg,
+    #7f1d1d 0%,
+    #dc2626 100%
+  );
+}
+
+:root {
+  --piano-keyboard-accent: var(--piano-accent, #3b82f6);
+  --piano-keyboard-text-muted: var(--piano-text-muted, #8a8a8a);
+}
+
+/* Piano key default styles - using hard-coded light colors (ignores theme) */
+.piano-white {
+  border-left-color: #bbb;
+  border-bottom-color: #bbb;
+  background: linear-gradient(to bottom, #eee 0%, #fff 100%);
+  box-shadow:
+    -1px 0 0 rgba(255, 255, 255, 0.8) inset,
+    0 0 5px #ccc inset,
+    0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.piano-black {
+  border-color: #000;
+  background: linear-gradient(45deg, #222 0%, #555 100%);
+  box-shadow:
+    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -5px 2px 3px rgba(0, 0, 0, 0.6) inset,
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Piano key playing state */
+.piano-white.piano-white-playing {
+  border-left-color: #999;
+  border-bottom-color: #999;
+  background: linear-gradient(to bottom, #fff 0%, #e9e9e9 100%);
+  box-shadow:
+    2px 0 3px rgba(0, 0, 0, 0.1) inset,
+    -5px 5px 20px rgba(0, 0, 0, 0.2) inset,
+    0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.piano-black.piano-black-playing {
+  box-shadow:
+    -1px -1px 2px rgba(255, 255, 255, 0.2) inset,
+    0 -2px 2px 3px rgba(0, 0, 0, 0.6) inset,
+    0 1px 2px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to right, #444 0%, #222 100%);
+}
+
+.piano-set:first-child {
+  border-radius: 5px 0 5px 5px;
+}
+
+.piano-set:last-child {
+  border-radius: 0 5px 5px 5px;
+}
+
+.piano-note:first-child {
+  border-radius: 5px 0 5px 5px;
+}
+
+.piano-note:last-child {
+  border-radius: 0 5px 5px 5px;
+}
