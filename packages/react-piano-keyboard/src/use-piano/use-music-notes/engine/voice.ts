@@ -1,4 +1,7 @@
-import { type OscillatorConfig, type Pitches } from "@react-piano-keyboard/shared";
+import {
+  type OscillatorConfig,
+  type Pitches,
+} from "@react-piano-keyboard/shared";
 
 export type OscillatorVoice = {
   osc: OscillatorNode;
@@ -30,6 +33,7 @@ export function createVoiceNodes(
   decay: number,
   sustain: number,
 ) {
+  const now = ctx.currentTime;
   const filterNode = ctx.createBiquadFilter();
   const envGain = ctx.createGain();
   const tremoloGain = ctx.createGain();
@@ -46,7 +50,8 @@ export function createVoiceNodes(
     oscNode.type = oscConfig.waveform;
     oscNode.frequency.value = freq * Math.pow(2, oscConfig.octave);
     oscNode.detune.value = oscConfig.detune;
-    gainNode.gain.value = oscConfig.gain;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(oscConfig.gain, now + attack);
     panNode.pan.value = oscConfig.pan;
 
     oscNode.connect(gainNode);
@@ -63,7 +68,6 @@ export function createVoiceNodes(
 
   tremoloGain.gain.value = 1;
 
-  const now = ctx.currentTime;
   const peakGain = gain;
   const sustainLevel = peakGain * sustain;
 
