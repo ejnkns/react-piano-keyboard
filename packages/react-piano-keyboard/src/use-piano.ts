@@ -147,7 +147,7 @@ export const usePiano = ({
 
   const mapping = useKeyMapping(allNotes, defaultMap);
 
-  const inputProps = useKeyboardInput({
+  useKeyboardInput({
     start: audio.start,
     stop: audio.stop,
     activeMap: mapping.keyMap,
@@ -163,6 +163,5 @@ export const usePiano = ({
     defaultMap,
     audio,
     mapping,
-    inputProps,
   };
 };

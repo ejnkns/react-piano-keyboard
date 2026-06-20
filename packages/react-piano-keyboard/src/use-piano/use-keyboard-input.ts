@@ -1,4 +1,4 @@
-import { useCallback, useEffect, KeyboardEvent } from "react";
+import { useEffect } from "react";
 import { Pitches, isPitch } from "../pitches";
 
 type UseKeyboardInputOptions = {
@@ -50,32 +50,4 @@ export const useKeyboardInput = ({
       window.removeEventListener("keyup", up);
     };
   }, [enabled, editMode, activeMap, start, stop]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLDivElement>) => {
-      if (editMode) return;
-      if (e.repeat) return;
-      const note = activeMap[e.key];
-      if (isPitch(note)) {
-        start(note);
-      }
-    },
-    [editMode, activeMap, start]
-  );
-
-  const handleKeyUp = useCallback(
-    (e: KeyboardEvent<HTMLDivElement>) => {
-      if (editMode) return;
-      const note = activeMap[e.key];
-      if (isPitch(note)) {
-        stop(note);
-      }
-    },
-    [editMode, activeMap, stop]
-  );
-
-  return {
-    onKeyDown: handleKeyDown,
-    onKeyUp: handleKeyUp,
-  };
 };

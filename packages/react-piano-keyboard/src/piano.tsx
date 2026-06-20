@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "./index.css";
 import { usePiano } from "./use-piano";
 import { PianoNotes } from "./piano/piano-notes";
@@ -77,8 +77,6 @@ export function Piano({
   const waveformOverrides =
     typeof waveformProp === "object" ? waveformProp : undefined;
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const isUncontrolled = !audioContext && !analyserNode;
 
   const [isOn, setIsOn] = useState(false);
@@ -116,7 +114,7 @@ export function Piano({
   const effectiveAudioContext = audioContext ?? localAudioContext ?? undefined;
   const effectiveAnalyserNode = analyserNode ?? localAnalyserNode ?? undefined;
 
-  const { notes, rowNotes, defaultMap, audio, mapping, inputProps } = usePiano({
+  const { notes, rowNotes, defaultMap, audio, mapping } = usePiano({
     rows,
     start,
     end,
@@ -179,13 +177,9 @@ export function Piano({
 
   return (
     <div
-      {...inputProps}
-      ref={containerRef}
-      tabIndex={0}
       className="piano bg-piano-bg-primary border border-piano-bg-tertiary rounded-[14px] overflow-hidden"
       style={{
         minWidth: "320px",
-        outline: "none",
         ...(isOn
           ? {}
           : ({

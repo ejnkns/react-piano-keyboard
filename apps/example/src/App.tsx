@@ -474,7 +474,7 @@ function HookWithPianoNotes() {
     [audioContext],
   );
 
-  const { notes, defaultMap, audio, mapping, inputProps } = usePiano({
+  const { notes, defaultMap, audio, mapping } = usePiano({
     rows: 2,
     start: "C2",
     analyserNode: analyser,
@@ -510,14 +510,10 @@ function HookWithPianoNotes() {
             margin: 0,
           }}
         >
-          <code>{`const { notes, audio, mapping, inputProps } = usePiano({
+          <code>{`const { notes, audio, mapping } = usePiano({
   rows: 2,
   start: "C2",
   analyserNode: analyser,
-  // New Phase 1 props (optional):
-  // sustain: 0.7, release: 1.2,
-  // filterCutoff: 2000, filterResonance: 3,
-  // lfoRate: 4, lfoDepth: 0.3, lfoTarget: "filter",
 })
 
 return (
@@ -526,7 +522,6 @@ return (
     notes={notes}
     audio={audio}
     mapping={mapping}
-    {...inputProps}
   />
 )`}</code>
         </pre>
@@ -536,8 +531,6 @@ return (
         <WaveformVisualizer analyserNode={analyser} height={120} />
       </div>
       <div
-        {...inputProps}
-        tabIndex={0}
         style={{ minWidth: "320px", marginTop: 12 }}
       >
         <div

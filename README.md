@@ -105,10 +105,6 @@ To set up the project locally:
 3. Run the unit test suite: `npm run test`.
 4. Build all workspaces for production: `npm run build`.
 
-## Keyboard Input Focus Notice
-
-For computer keyboard input mapping to work, the piano keyboard container must have focus. We apply `tabIndex={0}` to the container automatically to make it focusable. When the piano is in Standby mode, clicking the "Start Piano" overlay will automatically call `.focus()` on the container for a seamless experience.
-
 ## Theme
 
 Override CSS custom properties on `:root` or `[data-theme="light"]`:
@@ -119,9 +115,7 @@ Override CSS custom properties on `:root` or `[data-theme="light"]`:
   --piano-bg-primary: #1c1c1c;
   --piano-bg-tertiary: #0a0a0a;
   --piano-text-muted: #8a8a8a;
-  --piano-note-white-bg-top: #333333;
-  --piano-note-black-bg-to: #444444;
-  /* see theme.css for full list */
+  /* see index.css for full list */
 }
 ```
 
