@@ -1,5 +1,47 @@
-@import "tailwindcss/utilities";
-@config "../../../tailwind.config.ts";
+@import "tailwindcss";
+
+@theme {
+  --color-piano-accent: var(--piano-accent);
+  --color-piano-accent-off: var(--piano-accent-off);
+  --color-piano-bg-primary: var(--piano-bg-primary);
+  --color-piano-bg-secondary: var(--piano-bg-secondary);
+  --color-piano-bg-tertiary: var(--piano-bg-tertiary);
+  --color-piano-bg-elevated: var(--piano-bg-elevated);
+  --color-piano-border: var(--piano-border);
+  --color-piano-border-strong: var(--piano-border-strong);
+  --color-piano-text-primary: var(--piano-text-primary);
+  --color-piano-text-secondary: var(--piano-text-secondary);
+  --color-piano-text-muted: var(--piano-text-muted);
+  --color-piano-note-white-bg-top: var(--piano-note-white-bg-top);
+  --color-piano-note-white-bg-bottom: var(--piano-note-white-bg-bottom);
+  --color-piano-note-white-border: var(--piano-note-white-border);
+  --color-piano-note-white-text: var(--piano-note-white-text);
+  --color-piano-note-white-playing-top: var(--piano-note-white-playing-top);
+  --color-piano-note-white-playing-bottom: var(--piano-note-white-playing-bottom);
+  --color-piano-note-white-hover-top: var(--piano-note-white-hover-top);
+  --color-piano-note-white-hover-bottom: var(--piano-note-white-hover-bottom);
+  --color-piano-note-black-bg-from: var(--piano-note-black-bg-from);
+  --color-piano-note-black-bg-to: var(--piano-note-black-bg-to);
+  --color-piano-note-black-text: var(--piano-note-black-text);
+  --color-piano-note-black-playing-from: var(--piano-note-black-playing-from);
+  --color-piano-note-black-playing-to: var(--piano-note-black-playing-to);
+  --color-piano-note-black-hover-from: var(--piano-note-black-hover-from);
+  --color-piano-note-black-hover-to: var(--piano-note-black-hover-to);
+  --color-piano-controls-bg: var(--piano-controls-bg);
+  --color-piano-notes-well-bg: var(--piano-notes-well-bg);
+  --color-piano-waveform-bg: var(--piano-waveform-bg);
+  --color-piano-waveform-container-bg: var(--piano-waveform-container-bg);
+  --color-piano-power-border: var(--power-border);
+  --color-piano-power-bg: var(--power-bg);
+  --color-piano-power-shadow: var(--power-shadow);
+  --color-piano-power-bg-active: var(--power-bg-active);
+  --color-piano-power-shadow-active: var(--power-shadow-active);
+
+  --shadow-piano-case: 0 5px 15px rgba(0, 0, 0, 0.5);
+
+  --background-image-piano-conflict-white: linear-gradient(to bottom, #fca5a5 0%, #f87171 100%);
+  --background-image-piano-conflict-black: linear-gradient(45deg, #7f1d1d 0%, #dc2626 100%);
+}
 
 :root {
   --piano-accent: #3b82f6;
@@ -25,6 +67,7 @@
   --piano-note-white-playing-bottom: #303030;
   --piano-note-white-hover-top: #363636;
   --piano-note-white-hover-bottom: #303030;
+
   --piano-note-black-bg-from: #222222;
   --piano-note-black-bg-to: #444444;
   --piano-note-black-text: #999999;
@@ -44,7 +87,6 @@
   --power-bg-active: #262626;
   --power-shadow-active: 0 0px 1px rgba(0, 0, 0, 0.5) inset;
 }
-
 :root[data-theme="light"] {
   --piano-bg-primary: #f5f5f5;
   --piano-bg-secondary: #fafafa;
@@ -188,4 +230,13 @@
 
 .piano-power-button:active svg {
   transform: scale(0.95);
+}
+
+@keyframes scrollWave {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-14px);
+  }
 }
