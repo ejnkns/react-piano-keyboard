@@ -1,4 +1,4 @@
-import type { ControlValues } from "@react-piano-keyboard/shared";
+import type { ControlValues } from "@react-piano-keyboard/audio";
 
 export type SetFn = (
   opts:

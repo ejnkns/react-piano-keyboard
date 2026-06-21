@@ -7,5 +7,4 @@ export { useKeyboardInput } from "@react-piano-keyboard/piano-keyboard";
 export { useAudioContext } from "./use-audio-context";
 export { Piano } from "./piano";
 export { PianoNotes, type PianoNotesProps } from "@react-piano-keyboard/piano-keyboard";
-export { Controls, type ControlSection, WaveformVisualizer } from "@react-piano-keyboard/controls";
-export * from "@react-piano-keyboard/shared";
+export { Controls, type ControlSection, WaveformVisualizer, AudioVisualizer, MasterWaveformVisualizer } from "@react-piano-keyboard/controls";

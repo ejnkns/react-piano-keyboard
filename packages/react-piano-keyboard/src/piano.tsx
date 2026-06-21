@@ -7,12 +7,10 @@ import {
   type ControlSection,
   type SetFn,
   WaveformVisualizer,
+  MasterWaveformVisualizer,
 } from "@react-piano-keyboard/controls";
-import {
-  Pitches,
-  LfoTarget,
-  OscillatorConfig,
-} from "@react-piano-keyboard/shared";
+import { Pitches } from "@react-piano-keyboard/music";
+import { LfoTarget, OscillatorConfig } from "@react-piano-keyboard/audio";
 import { Audio } from "./use-piano/use-music-notes";
 
 export namespace Piano {
@@ -248,10 +246,7 @@ export function Piano({
         )}
         {showWaveform && (
           <div className="piano-screen bg-piano-waveform-container-bg p-3">
-            <WaveformVisualizer
-              analyserNode={effectiveAnalyserNode}
-              {...waveformOverrides}
-            />
+            <WaveformVisualizer analyserNode={effectiveAnalyserNode} />
           </div>
         )}
       </div>

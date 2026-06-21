@@ -2,11 +2,10 @@ import { describe, it, expect } from "vitest";
 import {
   getKeyToNoteMap,
   getTwoRowKeyToNoteMap,
-  getPitchRangeForWhiteKeyCount,
   mapNotesToRow,
-} from "./piano-utils";
-import { OctaveRows } from "./keyboard-layout";
-import { getPitchRange } from "./pitches";
+} from "../keyboard-mapping";
+import { OctaveRows } from "../keyboard-layout";
+import { getPitchRange, getPitchRangeForWhiteKeyCount } from "@react-piano-keyboard/music";
 
 describe("getPitchRangeForWhiteKeyCount", () => {
   it("returns empty array for zero white keys", () => {

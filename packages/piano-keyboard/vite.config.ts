@@ -12,7 +12,7 @@ export default defineConfig({
       fileName: (format) => `index.${format === "es" ? "mjs" : "cjs"}`,
     },
     rollupOptions: {
-      external: ["react", "react-dom"],
+      external: ["react", "react-dom", "@react-piano-keyboard/music"],
     },
     sourcemap: true,
   },

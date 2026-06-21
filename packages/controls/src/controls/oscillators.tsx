@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { isOscillatorType, type OscillatorConfig } from "@react-piano-keyboard/shared";
+import {
+  isOscillatorType,
+  type OscillatorConfig,
+} from "@react-piano-keyboard/audio";
 import { Slider } from "./shared/slider";
 import { WavePicker } from "./shared/wave-picker";
 import type { PickerOption } from "./shared/picker";
@@ -13,9 +16,7 @@ export type OscillatorHandlers = {
   ) => void;
 };
 
-export function getOscillatorHandlers(
-  set: SetFn,
-): OscillatorHandlers {
+export function getOscillatorHandlers(set: SetFn): OscillatorHandlers {
   const oscillator = (
     index: number,
     field: keyof OscillatorConfig,
@@ -47,9 +48,7 @@ const WAVEFORM_OPTIONS: PickerOption[] = [
   { value: "square" },
 ];
 
-function Separator() {
-  return <div className="h-px self-stretch bg-piano-border mx-1" />;
-}
+function Separator() {}
 
 function OscillatorControls({
   index,
@@ -151,8 +150,8 @@ export function getOscillatorSection({
         />
         {oscCount === 2 && (
           <>
-            <Separator />
-            <div className="flex-1 flex items-start pt-2">
+            <div className="h-px self-stretch bg-piano-border mt-4 mx-1" />
+            <div className="flex-1 flex items-end pt-2">
               <OscillatorControls
                 index={1}
                 label="Osc 2"

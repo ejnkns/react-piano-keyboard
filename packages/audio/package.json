@@ -1,7 +1,7 @@
 {
-  "name": "@react-piano-keyboard/controls",
+  "name": "@react-piano-keyboard/audio",
   "version": "0.1.0",
-  "description": "Controls and visualizers for react-piano-keyboard",
+  "description": "Audio types, defaults, presets, and synth hooks for react-piano-keyboard",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -12,7 +12,11 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./styles.css": "./dist/controls.css"
+    "./defaults": {
+      "types": "./dist/defaults.d.ts",
+      "import": "./dist/defaults.mjs",
+      "require": "./dist/defaults.cjs"
+    }
   },
   "files": [
     "dist",
@@ -23,12 +27,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-piano-keyboard/audio": "*",
     "@react-piano-keyboard/music": "*"
-  },
-  "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "license": "MIT",
   "devDependencies": {

@@ -3,8 +3,8 @@ import {
   Pitches,
   getPitchRange,
   getPitchRangeForWhiteKeyCount,
-  OctaveRows,
-} from "@react-piano-keyboard/shared";
+} from "@react-piano-keyboard/music";
+import { OctaveRows } from "./keyboard-layout";
 import { PianoNotes } from "./piano-notes";
 import { useKeyboardInput } from "./use-keyboard-input";
 

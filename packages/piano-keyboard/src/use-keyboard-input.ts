@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Pitches, isPitch } from "@react-piano-keyboard/shared";
+import { Pitches, isPitch } from "@react-piano-keyboard/music";
 
 type UseKeyboardInputOptions = {
   start: (note: Pitches.Pitch) => void;

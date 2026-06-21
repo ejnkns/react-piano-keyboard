@@ -1,14 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
 import {
   Piano,
-  PianoNotes,
-  WaveformVisualizer,
-  usePiano,
-  useAudioContext,
-  PITCH_CLASSES,
+  MasterWaveformVisualizer,
 } from "react-piano-keyboard";
+import { PITCH_CLASSES } from "react-piano-keyboard/music";
+import type { Pitches } from "react-piano-keyboard/music";
 import type {
-  Pitches,
   UseMusicNotes,
   Audio,
   ControlSection,
@@ -267,7 +264,7 @@ function PitchSelect({
         onChange={(e) => onNoteChange(e.target.value)}
         style={selectStyle}
       >
-        {PITCH_CLASSES.map((n) => (
+        {PITCH_CLASSES.map((n: string) => (
           <option key={n} value={n}>
             {n}
           </option>
@@ -469,133 +466,6 @@ function InteractiveExample() {
   );
 }
 
-function HookWithPianoNotes() {
-  const audioContext = useAudioContext();
-  const analyser = useMemo(
-    () => audioContext?.createAnalyser(),
-    [audioContext],
-  );
-
-  const { notes, defaultMap, audio, mapping } = usePiano({
-    rows: 2,
-    start: "C2",
-    analyserNode: analyser,
-  });
-
-  if (!audioContext) {
-    return (
-      <section style={section}>
-        <p
-          style={{
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 12,
-            color: "var(--piano-text-muted)",
-          }}
-        >
-          Loading...
-        </p>
-      </section>
-    );
-  }
-
-  return (
-    <section style={section}>
-      <div style={codeBlock}>
-        <pre
-          style={{
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 12,
-            lineHeight: 1.6,
-            color: "var(--piano-text-muted)",
-            whiteSpace: "pre",
-            tabSize: 2,
-            margin: 0,
-          }}
-        >
-          <code>{`const { notes, audio, mapping } = usePiano({
-  rows: 2,
-  start: "C2",
-  analyserNode: analyser,
-})
-
-return (
-  <PianoNotes
-    id="piano3"
-    notes={notes}
-    audio={audio}
-    mapping={mapping}
-  />
-)`}</code>
-        </pre>
-      </div>
-      <PresetBar set={audio.set} />
-      <div style={{ marginTop: 12 }}>
-        <WaveformVisualizer analyserNode={analyser} height={120} />
-      </div>
-      <div style={{ minWidth: "320px", marginTop: 12 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: 4,
-          }}
-        >
-          <button
-            onClick={mapping.toggleEditMode}
-            style={{
-              padding: "4px 10px",
-              fontSize: 12,
-              fontFamily: "ui-monospace, monospace",
-              cursor: "pointer",
-              background: mapping.editMode
-                ? "var(--piano-accent)"
-                : "var(--piano-bg-elevated)",
-              color: mapping.editMode
-                ? "var(--piano-bg-tertiary)"
-                : "var(--piano-text-secondary)",
-              border: "none",
-              borderRadius: 4,
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {mapping.editMode ? "Editing Keys" : "Edit Keys"}
-          </button>
-        </div>
-        {mapping.editMode && (
-          <div
-            style={{
-              fontSize: 11,
-              fontFamily: "ui-monospace, monospace",
-              color: "var(--piano-text-muted)",
-              marginBottom: 4,
-            }}
-          >
-            Click a piano key, then press a computer key to map it
-          </div>
-        )}
-        <PianoNotes
-          id="piano3"
-          notes={notes}
-          audio={{
-            start: audio.start,
-            stop: audio.stop,
-            playingNotes: audio.playingNotes,
-          }}
-          mapping={{
-            keyNoteMap: defaultMap,
-            customKeyMap: mapping.keyMap,
-            editMode: mapping.editMode,
-            selectedNote: mapping.selectedNote,
-            conflictNote: mapping.conflictNote,
-            onNoteSelect: mapping.selectNote,
-          }}
-        />
-      </div>
-    </section>
-  );
-}
-
 export default function App() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
@@ -724,9 +594,6 @@ export default function App() {
           <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <InteractiveExample />
           </div>
-          {/* <div>
-            <HookWithPianoNotes />
-          </div> */}
         </div>
       </div>
     </div>

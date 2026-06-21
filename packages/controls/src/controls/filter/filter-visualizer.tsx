@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useRef, useEffect } from "react";
 
 const FS = 44100;
 const POINTS = 120;
@@ -109,6 +109,9 @@ function biquadCoeffs(
         a2: A + 1 - (A - 1) * cosW - twoSqrtA * alpha,
       };
     }
+    default: {
+      return { b0: 1, b1: 0, b2: 0, a0: 1, a1: 0, a2: 0 };
+    }
   }
 }
 
@@ -131,131 +134,147 @@ function magDb(
   return 10 * Math.log10(Math.max(magSq, 1e-10));
 }
 
+const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
+  getComputedStyle(el)
+    .getPropertyValue(name)
+    .trim() || fallback;
+
 export const FilterVisualizer = ({
   filterType,
   cutoff,
   resonance,
 }: FilterVisualizerProps) => {
-  const w = 220;
-  const h = 90;
-  const pad = { t: 6, r: 8, b: 14, l: 28 };
-  const pw = w - pad.l - pad.r;
-  const ph = h - pad.t - pad.b;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const logMin = Math.log10(MIN_FREQ);
-  const logMax = Math.log10(MAX_FREQ);
-  const toX = (f: number) =>
-    pad.l + ((Math.log10(f) - logMin) / (logMax - logMin)) * pw;
-  const toY = (db: number) =>
-    pad.t + (1 - (db - MIN_DB) / (MAX_DB - MIN_DB)) * ph;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  const curve = useMemo(() => {
-    const coeffs = biquadCoeffs(
-      filterType,
-      Math.max(cutoff, 1),
-      Math.max(resonance, 0.001),
-      0,
-    );
-    const pts: string[] = [];
-    for (let i = 0; i < POINTS; i++) {
-      const freq = MIN_FREQ * Math.pow(MAX_FREQ / MIN_FREQ, i / (POINTS - 1));
-      const db = magDb(freq, coeffs);
-      pts.push(`${toX(freq).toFixed(1)},${toY(db).toFixed(1)}`);
-    }
-    return pts.join(" ");
+    const w = 220;
+    const h = 90;
+    const pad = { t: 6, r: 8, b: 14, l: 28 };
+    const pw = w - pad.l - pad.r;
+    const ph = h - pad.t - pad.b;
+
+    let cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
+    let cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+    let cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+    let cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = cachedBgColor;
+      ctx.fillRect(0, 0, w, h);
+
+      const logMin = Math.log10(MIN_FREQ);
+      const logMax = Math.log10(MAX_FREQ);
+      const toX = (f: number) => pad.l + ((Math.log10(f) - logMin) / (logMax - logMin)) * pw;
+      const toY = (db: number) => pad.t + (1 - (db - MIN_DB) / (MAX_DB - MIN_DB)) * ph;
+
+      // Draw grid dB lines
+      ctx.strokeStyle = cachedBorderColor;
+      ctx.lineWidth = 0.5;
+      ctx.fillStyle = cachedTextColor;
+      ctx.font = "6px ui-monospace, monospace";
+      ctx.textAlign = "end";
+
+      [0.25, 0.5, 0.75].forEach((f) => {
+        const val = MIN_DB + f * (MAX_DB - MIN_DB);
+        const y = toY(val);
+        ctx.beginPath();
+        ctx.moveTo(pad.l, y);
+        ctx.lineTo(pad.l + pw, y);
+        ctx.stroke();
+
+        ctx.fillText(`${val > 0 ? "+" : ""}${Math.round(val)}dB`, pad.l - 4, y + 2);
+      });
+
+      // Draw frequency vertical grid lines
+      const freqs = [100, 1000, 10000];
+      ctx.textAlign = "center";
+      freqs.forEach((freq) => {
+        const x = toX(freq);
+        ctx.beginPath();
+        ctx.moveTo(x, pad.t);
+        ctx.lineTo(x, pad.t + ph);
+        ctx.stroke();
+
+        let label = `${freq}Hz`;
+        if (freq >= 1000) {
+          label = `${freq / 1000}kHz`;
+        }
+        ctx.fillText(label, x, pad.t + ph + 10);
+      });
+
+      // Draw zero dB line
+      const zeroY = toY(0);
+      ctx.strokeStyle = cachedTextColor;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2, 2]);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, zeroY);
+      ctx.lineTo(pad.l + pw, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw cutoff frequency line
+      const cutoffX = toX(cutoff);
+      ctx.strokeStyle = cachedAccentColor;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath();
+      ctx.moveTo(cutoffX, pad.t);
+      ctx.lineTo(cutoffX, pad.t + ph);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw response curve
+      const coeffs = biquadCoeffs(filterType, Math.max(cutoff, 1), Math.max(resonance, 0.001), 0);
+      ctx.beginPath();
+      ctx.strokeStyle = cachedAccentColor;
+      ctx.lineWidth = 2;
+      for (let i = 0; i < POINTS; i++) {
+        const freq = MIN_FREQ * Math.pow(MAX_FREQ / MIN_FREQ, i / (POINTS - 1));
+        const db = magDb(freq, coeffs);
+        const x = toX(freq);
+        const y = toY(db);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    };
+
+    draw();
+
+    const observer = new MutationObserver(() => {
+      cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
+      cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+      cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+      cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+      draw();
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class", "style"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, [filterType, cutoff, resonance]);
 
-  const cutoffX = toX(Math.max(cutoff, MIN_FREQ));
-  const cutoffY0 = pad.t;
-  const cutoffY1 = pad.t + ph;
-
-  const zeroDbY = toY(0);
-
-  const gridFreqs = [50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
-  const gridDb = [MIN_DB, MIN_DB / 2, 0, MAX_DB / 2, MAX_DB];
-
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <rect
-        x={0}
-        y={0}
-        width={w}
-        height={h}
-        rx={4}
-        fill="var(--piano-bg-tertiary)"
-      />
-
-      <line
-        x1={pad.l}
-        y1={zeroDbY}
-        x2={pad.l + pw}
-        y2={zeroDbY}
-        stroke="var(--piano-border-strong)"
-        strokeWidth={0.5}
-        opacity={0.3}
-        strokeDasharray="2,2"
-      />
-
-      {gridFreqs.map((f) => (
-        <line
-          key={`g-${f}`}
-          x1={toX(f)}
-          y1={pad.t}
-          x2={toX(f)}
-          y2={pad.t + ph}
-          stroke="var(--piano-border-strong)"
-          strokeWidth={0.5}
-          opacity={0.15}
-        />
-      ))}
-
-      {[100, 1000, 10000].map((f) => (
-        <text
-          key={`l-${f}`}
-          x={toX(f)}
-          y={pad.t + ph + 10}
-          textAnchor="middle"
-          fill="var(--piano-text-muted)"
-          fontSize={6}
-          fontFamily="ui-monospace, monospace"
-        >
-          {f >= 1000 ? `${(f / 1000).toFixed(0)}k` : `${f}`}
-        </text>
-      ))}
-
-      {gridDb.map((db) => (
-        <text
-          key={`db-${db}`}
-          x={pad.l - 3}
-          y={toY(db) + 2}
-          textAnchor="end"
-          fill="var(--piano-text-muted)"
-          fontSize={6}
-          fontFamily="ui-monospace, monospace"
-        >
-          {db === 0 ? "0" : `${db > 0 ? "+" : ""}${db}`}
-        </text>
-      ))}
-
-      <line
-        x1={cutoffX}
-        y1={cutoffY0}
-        x2={cutoffX}
-        y2={cutoffY1}
-        stroke="var(--piano-accent)"
-        strokeWidth={0.5}
-        opacity={0.35}
-        strokeDasharray="3,2"
-      />
-
-      <polyline
-        points={curve}
-        fill="none"
-        stroke="var(--piano-accent)"
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    </svg>
+    <canvas
+      ref={canvasRef}
+      width={220}
+      height={90}
+      style={{
+        display: "block",
+        backgroundColor: "var(--piano-bg-tertiary)",
+        borderRadius: "4px",
+      }}
+    />
   );
 };

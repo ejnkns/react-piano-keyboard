@@ -1,13 +1,5 @@
-import { useRef, useEffect, useState, useMemo } from "react";
-import { pitchToFrequency } from "@react-piano-keyboard/shared";
-
-const fmt = (v: number) => v.toFixed(2) + "s";
-
-const MIN_FREQ = 32;
-const MAX_FREQ = 4200;
-const MIN_OPACITY = 0.2;
-
-type NoteRange = { min: string; max: string };
+import { useRef, useEffect, useMemo } from "react";
+import { pitchToFrequency } from "@react-piano-keyboard/music";
 
 type Envelope = {
   gain: number;
@@ -23,6 +15,10 @@ type EnvelopeEntry = {
   noteOffAt: number | null;
   releaseAtStop?: number;
 };
+
+const MIN_FREQ = 32;
+const MAX_FREQ = 4200;
+const MIN_OPACITY = 0.2;
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -65,6 +61,11 @@ function computeDotPos(
   return { x: l.x3, y: l.sustainY };
 }
 
+const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
+  getComputedStyle(el)
+    .getPropertyValue(name)
+    .trim() || fallback;
+
 export const AdsrVisualizer = ({
   gain,
   attack,
@@ -73,271 +74,210 @@ export const AdsrVisualizer = ({
   release,
   activity,
   noteRange,
-}: Envelope & { activity?: Record<number, EnvelopeEntry>; noteRange?: NoteRange }) => {
-  const w = 330;
-  const h = 150;
-  const pad = { t: 6, r: 14, b: 18, l: 22 };
-  const pw = w - pad.l - pad.r;
-  const ph = h - pad.t - pad.b;
-
-  const holdTime = 0.3;
-  const totalTime = attack + decay + holdTime + release;
-  const toX = (t: number) => pad.l + (t / totalTime) * pw;
-
-  const x0 = pad.l;
-  const x1 = toX(attack);
-  const x2 = toX(attack + decay);
-  const x3 = toX(attack + decay + holdTime);
-  const x4 = pad.l + pw;
-
-  const yTop = pad.t;
-  const yBot = pad.t + ph;
-  const toY = (v: number) => yBot - v * ph;
-  const sustainY = toY(sustain);
-
-  const pts = [
-    `${x0},${yBot}`,
-    `${x1},${yTop}`,
-    `${x2},${sustainY}`,
-    `${x3},${sustainY}`,
-    `${x4},${yBot}`,
-  ];
-
-  const gridLines = [0.25, 0.5, 0.75].map((f) => ({
-    y: toY(f),
-    label: f,
-  }));
-
-  const gainY = toY(Math.min(gain, 1));
-
-  const phaseTicks = [
-    { x: x1, time: attack },
-    { x: x2, time: attack + decay },
-    { x: x3, time: attack + decay + holdTime },
-    { x: x4, time: totalTime },
-  ];
-
-  const tickCount = 4;
-  const evenTicks = Array.from({ length: tickCount - 1 }, (_, i) => {
-    const t = (totalTime / tickCount) * (i + 1);
-    return { x: toX(t), t };
-  });
-
-  const activityRef = useRef(activity);
-  activityRef.current = activity;
+}: Envelope & { activity?: Record<number, EnvelopeEntry>; noteRange?: { min: string; max: string } }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const minFreq = useMemo(() => {
-    if (!noteRange) return 32;
-    try { return pitchToFrequency(noteRange.min as any); } catch { return 32; }
+    if (!noteRange) return MIN_FREQ;
+    try { return pitchToFrequency(noteRange.min as any); } catch { return MIN_FREQ; }
   }, [noteRange?.min]);
+
   const maxFreq = useMemo(() => {
-    if (!noteRange) return 4200;
-    try { return pitchToFrequency(noteRange.max as any); } catch { return 4200; }
+    if (!noteRange) return MAX_FREQ;
+    try { return pitchToFrequency(noteRange.max as any); } catch { return MAX_FREQ; }
   }, [noteRange?.max]);
 
-  const [dots, setDots] = useState<Record<string, { x: number; y: number; opacity: number; key: number }>>({});
-  const dotKeysRef = useRef<Record<string, number>>({});
-  const dotTimestampsRef = useRef<Record<string, number>>({});
-  const dotKeyCounter = useRef(0);
-
   useEffect(() => {
-    let rafId: number;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    const tick = () => {
-      const entries = activityRef.current;
-      const newDots: Record<string, { x: number; y: number; opacity: number; key: number }> = {};
+    const w = 330;
+    const h = 150;
+    const pad = { t: 6, r: 14, b: 18, l: 22 };
+    const pw = w - pad.l - pad.r;
+    const ph = h - pad.t - pad.b;
 
-      if (entries) {
-        for (const [voiceId, entry] of Object.entries(entries)) {
+    let cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
+    let cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+    let cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+    let cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+
+    const observer = new MutationObserver(() => {
+      cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
+      cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+      cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+      cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class", "style"],
+    });
+
+    let animationId: number;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = cachedBgColor;
+      ctx.fillRect(0, 0, w, h);
+
+      const holdTime = 0.3;
+      const totalTime = attack + decay + holdTime + release;
+      const toX = (t: number) => pad.l + (t / totalTime) * pw;
+
+      const x0 = pad.l;
+      const x1 = toX(attack);
+      const x2 = toX(attack + decay);
+      const x3 = toX(attack + decay + holdTime);
+      const x4 = pad.l + pw;
+
+      const yTop = pad.t;
+      const yBot = pad.t + ph;
+      const toY = (v: number) => yBot - v * ph;
+      const sustainY = toY(sustain);
+
+      // Draw grid lines
+      ctx.strokeStyle = cachedBorderColor;
+      ctx.lineWidth = 0.5;
+      ctx.fillStyle = cachedTextColor;
+      ctx.font = "6px ui-monospace, monospace";
+      ctx.textAlign = "end";
+
+      [0.25, 0.5, 0.75].forEach((f) => {
+        const y = toY(f);
+        ctx.beginPath();
+        ctx.moveTo(pad.l, y);
+        ctx.lineTo(pad.l + pw, y);
+        ctx.stroke();
+
+        ctx.fillText(f.toFixed(2), pad.l - 4, y + 2);
+      });
+
+      // Draw Gain line
+      const gainY = toY(Math.min(gain, 1));
+      ctx.beginPath();
+      ctx.strokeStyle = cachedAccentColor;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 3]);
+      ctx.moveTo(x0, gainY);
+      ctx.lineTo(x4, gainY);
+      ctx.stroke();
+      ctx.setLineDash([]); // Reset dash
+
+      ctx.fillStyle = cachedAccentColor;
+      ctx.font = "6px ui-monospace, monospace";
+      ctx.fillText(`Gain: ${gain.toFixed(2)}`, x4 - 40, gainY - 3);
+
+      // Draw phase tick marks
+      ctx.strokeStyle = cachedBorderColor;
+      ctx.lineWidth = 0.5;
+      ctx.fillStyle = cachedTextColor;
+      [
+        { x: x1, label: `${attack.toFixed(2)}s` },
+        { x: x2, label: `${(attack + decay).toFixed(2)}s` },
+        { x: x3, label: `${(attack + decay + holdTime).toFixed(2)}s` },
+        { x: x4, label: `${totalTime.toFixed(2)}s` },
+      ].forEach((tick) => {
+        ctx.beginPath();
+        ctx.moveTo(tick.x, yBot);
+        ctx.lineTo(tick.x, yBot + 4);
+        ctx.stroke();
+
+        ctx.font = "6px ui-monospace, monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(tick.label, tick.x, yBot + 12);
+      });
+
+      // Draw dashed helper lines
+      ctx.strokeStyle = cachedAccentColor;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2, 2]);
+      if (attack > 0) {
+        ctx.beginPath();
+        ctx.moveTo(x1, yTop);
+        ctx.lineTo(x1, yBot);
+        ctx.stroke();
+      }
+      if (release > 0) {
+        ctx.beginPath();
+        ctx.moveTo(x3, sustainY);
+        ctx.lineTo(x3, yBot);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // Draw envelope curve
+      ctx.beginPath();
+      ctx.moveTo(x0, yBot);
+      ctx.lineTo(x1, yTop);
+      ctx.lineTo(x2, sustainY);
+      ctx.lineTo(x3, sustainY);
+      ctx.lineTo(x4, yBot);
+      ctx.strokeStyle = cachedAccentColor;
+      ctx.lineWidth = 2;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Draw anchor circles
+      ctx.fillStyle = cachedAccentColor;
+      [
+        { x: x1, y: yTop },
+        { x: x2, y: sustainY },
+        { x: x3, y: sustainY },
+      ].forEach((pt) => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw active note dots
+      const now = performance.now();
+      if (activity) {
+        for (const [voiceId, entry] of Object.entries(activity)) {
           const pos = computeDotPos(
             entry,
             { attack, decay, sustain, release },
             { x0, x1, x2, x3, x4, yTop, yBot, sustainY },
-            performance.now(),
+            now,
           );
           if (pos) {
-            if (!dotKeysRef.current[voiceId] || dotTimestampsRef.current[voiceId] !== entry.noteOnAt) {
-              dotKeysRef.current[voiceId] = ++dotKeyCounter.current;
-              dotTimestampsRef.current[voiceId] = entry.noteOnAt;
-            }
             let freq: number;
             try { freq = pitchToFrequency(entry.note as any); } catch { freq = 440; }
-            newDots[voiceId] = {
-              ...pos,
-              opacity: freqOpacity(freq, minFreq, maxFreq),
-              key: dotKeysRef.current[voiceId],
-            };
-          } else {
-            delete dotKeysRef.current[voiceId];
-            delete dotTimestampsRef.current[voiceId];
+            const opacity = freqOpacity(freq, minFreq, maxFreq);
+
+            ctx.fillStyle = cachedAccentColor;
+            ctx.globalAlpha = opacity;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0; // Reset alpha
           }
         }
       }
 
-      for (const voiceId of Object.keys(dotKeysRef.current)) {
-        if (!newDots[voiceId]) {
-          delete dotKeysRef.current[voiceId];
-          delete dotTimestampsRef.current[voiceId];
-        }
-      }
-
-      setDots(newDots);
-
-      rafId = requestAnimationFrame(tick);
+      animationId = requestAnimationFrame(draw);
     };
 
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [attack, decay, sustain, release, x0, x1, x2, x3, x4, yTop, yBot, sustainY]);
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      observer.disconnect();
+    };
+  }, [gain, attack, decay, sustain, release, activity, minFreq, maxFreq]);
 
   return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
-      <rect
-        x={0}
-        y={0}
-        width={w}
-        height={h}
-        rx={4}
-        fill="var(--piano-bg-tertiary)"
-      />
-
-      {gridLines.map(({ y, label }) => (
-        <g key={label}>
-          <line
-            x1={pad.l}
-            y1={y}
-            x2={pad.l + pw}
-            y2={y}
-            stroke="var(--piano-border-strong)"
-            strokeWidth={0.5}
-            opacity={0.3}
-          />
-          <text
-            x={pad.l - 2}
-            y={y + 2}
-            textAnchor="end"
-            fill="var(--piano-text-muted)"
-            fontSize={6}
-            fontFamily="ui-monospace, monospace"
-          >
-            {label}
-          </text>
-        </g>
-      ))}
-
-      <line
-        x1={x0}
-        y1={gainY}
-        x2={x4}
-        y2={gainY}
-        stroke="var(--piano-accent)"
-        strokeWidth={1}
-        strokeDasharray="4,3"
-        opacity={0.6}
-      />
-      <text
-        x={x4 - 2}
-        y={gainY - 2}
-        textAnchor="end"
-        fill="var(--piano-accent)"
-        fontSize={7}
-        fontFamily="ui-monospace, monospace"
-        opacity={0.8}
-      >
-        Gain {gain.toFixed(2)}
-      </text>
-
-      {phaseTicks.map(({ x, time }) => (
-        <g key={`phase-${time}`}>
-          <line
-            x1={x}
-            y1={yBot}
-            x2={x}
-            y2={yBot + 4}
-            stroke="var(--piano-text-muted)"
-            strokeWidth={0.5}
-          />
-          <text
-            x={x}
-            y={yBot + 12}
-            textAnchor="middle"
-            fill="var(--piano-text-muted)"
-            fontSize={6}
-            fontFamily="ui-monospace, monospace"
-          >
-            {fmt(time)}
-          </text>
-        </g>
-      ))}
-
-      {evenTicks.map(({ x, t }) => (
-        <line
-          key={`tick-${t}`}
-          x1={x}
-          y1={yBot}
-          x2={x}
-          y2={yBot + 3}
-          stroke="var(--piano-border-strong)"
-          strokeWidth={0.5}
-          opacity={0.4}
-        />
-      ))}
-
-      {attack > 0 && (
-        <line
-          x1={x1}
-          y1={yTop}
-          x2={x1}
-          y2={yBot}
-          stroke="var(--piano-accent)"
-          strokeWidth={0.5}
-          opacity={0.25}
-          strokeDasharray="2,2"
-        />
-      )}
-      {release > 0 && (
-        <line
-          x1={x3}
-          y1={sustainY}
-          x2={x3}
-          y2={yBot}
-          stroke="var(--piano-accent)"
-          strokeWidth={0.5}
-          opacity={0.25}
-          strokeDasharray="2,2"
-        />
-      )}
-
-      <polyline
-        points={pts.join(" ")}
-        fill="none"
-        stroke="var(--piano-accent)"
-        strokeWidth={2}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-
-      <circle cx={x1} cy={yTop} r={2.5} fill="var(--piano-accent)" />
-      <circle cx={x2} cy={sustainY} r={2.5} fill="var(--piano-accent)" />
-      <circle cx={x3} cy={sustainY} r={2.5} fill="var(--piano-accent)" />
-
-      {Object.entries(dots).map(([note, { x, y, opacity, key }]) => (
-        <circle
-          key={key}
-          cx={x}
-          cy={y}
-          r={3}
-          fill="var(--piano-accent)"
-          fillOpacity={opacity}
-          stroke="var(--piano-accent)"
-          strokeWidth={1.5}
-          strokeOpacity={0.7}
-        >
-          <animate attributeName="r" values="0;3" dur="150ms" fill="freeze" />
-          <animate attributeName="fill-opacity" values={`0;${opacity}`} dur="50ms" fill="freeze" />
-          <animate attributeName="stroke-opacity" values={`0;0.7`} dur="50ms" fill="freeze" />
-        </circle>
-      ))}
-    </svg>
+    <canvas
+      ref={canvasRef}
+      width={330}
+      height={150}
+      style={{
+        display: "block",
+        backgroundColor: "var(--piano-bg-tertiary)",
+        borderRadius: "4px",
+      }}
+    />
   );
 };

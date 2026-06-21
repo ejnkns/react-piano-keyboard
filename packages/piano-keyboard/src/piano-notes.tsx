@@ -1,4 +1,4 @@
-import { Pitches } from "@react-piano-keyboard/shared";
+import { Pitches } from "@react-piano-keyboard/music";
 import { useMouseAndTouchDown } from "./notes/use-mouse-down";
 
 type AudioProps = {

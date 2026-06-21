@@ -70,10 +70,17 @@ export default defineConfig({
         ),
       },
       {
-        find: /^@react-piano-keyboard\/shared$/,
+        find: /^react-piano-keyboard\/music$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/shared/src/index.ts",
+          "../../packages/react-piano-keyboard/src/music.ts",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/music$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/music/src/index.ts",
         ),
       },
       {

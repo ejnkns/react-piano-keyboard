@@ -51,3 +51,9 @@ export {
 export {
   AnalogClipVisualizer,
 } from "./controls/analog-clip/analog-clip-visualizer";
+export {
+  AudioVisualizer,
+} from "./controls/audio-monitor/audio-visualizer";
+export {
+  MasterWaveformVisualizer,
+} from "./controls/audio-monitor/master-waveform-visualizer";

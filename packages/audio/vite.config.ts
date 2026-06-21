@@ -5,14 +5,16 @@ import dts from "vite-plugin-dts";
 export default defineConfig({
   plugins: [dts({ include: ["src"] })],
   build: {
-    cssCodeSplit: false,
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: {
+        index: resolve(__dirname, "src/index.ts"),
+        defaults: resolve(__dirname, "src/defaults.ts"),
+      },
       formats: ["es", "cjs"],
-      fileName: (format) => `index.${format === "es" ? "mjs" : "cjs"}`,
+      fileName: (format, name) => `${name}.${format === "es" ? "mjs" : "cjs"}`,
     },
     rollupOptions: {
-      external: ["react", "react-dom", "@react-piano-keyboard/audio", "@react-piano-keyboard/music"],
+      external: ["@react-piano-keyboard/music"],
     },
     sourcemap: true,
   },

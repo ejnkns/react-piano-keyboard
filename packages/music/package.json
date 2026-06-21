@@ -1,7 +1,7 @@
 {
-  "name": "@react-piano-keyboard/shared",
+  "name": "@react-piano-keyboard/music",
   "version": "0.1.0",
-  "description": "Shared utilities for react-piano-keyboard",
+  "description": "Music and pitch utilities for react-piano-keyboard",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -14,8 +14,7 @@
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "vite build",

@@ -53,53 +53,65 @@ export function getAdsrEnvelopeSection({
     size: "full" as const,
     onToggle: handlers.adsrEnabled,
     group: (
-      <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-2 h-full flex flex-col">
-        <div className="flex items-start gap-2 justify-between">
-          <Slider
-            name="Gain"
-            defaultValue={defaultValues?.gain}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={handlers.gain}
-          />
-          <Slider
-            name="Attack"
-            defaultValue={defaultValues?.attack}
-            min={0.01}
-            max={2}
-            step={0.01}
-            unit="s"
-            onChange={handlers.attack}
-          />
-          <Slider
-            name="Decay"
-            defaultValue={defaultValues?.decay}
-            min={0.01}
-            max={2}
-            step={0.01}
-            unit="s"
-            onChange={handlers.decay}
-          />
-          <Slider
-            name="Sustain"
-            defaultValue={defaultValues?.sustain}
-            min={0}
-            max={1}
-            step={0.01}
-            onChange={handlers.sustain}
-          />
-          <Slider
-            name="Release"
-            defaultValue={defaultValues?.release}
-            min={0.01}
-            max={5}
-            step={0.01}
-            unit="s"
-            onChange={handlers.release}
-          />
-        </div>
-        <div className="flex-1 min-h-0">
+      <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-2 h-full grid grid-cols-5 gap-4 items-center" style={{ width: "max-content" }}>
+        {/* Row 1, Col 1: Empty */}
+        <div />
+
+        {/* Row 1, Col 2: Attack */}
+        <Slider
+          name="Attack"
+          defaultValue={defaultValues?.attack}
+          min={0.01}
+          max={2}
+          step={0.01}
+          unit="s"
+          onChange={handlers.attack}
+        />
+
+        {/* Row 1, Col 3: Decay */}
+        <Slider
+          name="Decay"
+          defaultValue={defaultValues?.decay}
+          min={0.01}
+          max={2}
+          step={0.01}
+          unit="s"
+          onChange={handlers.decay}
+        />
+
+        {/* Row 1, Col 4: Sustain */}
+        <Slider
+          name="Sustain"
+          defaultValue={defaultValues?.sustain}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={handlers.sustain}
+        />
+
+        {/* Row 1, Col 5: Release */}
+        <Slider
+          name="Release"
+          defaultValue={defaultValues?.release}
+          min={0.01}
+          max={5}
+          step={0.01}
+          unit="s"
+          onChange={handlers.release}
+        />
+
+        {/* Row 2, Col 1: Gain */}
+        <Slider
+          name="Gain"
+          defaultValue={defaultValues?.gain}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={handlers.gain}
+        />
+
+        {/* Row 2, Col 2-5: Visualizer (4 cols wide) */}
+        <div className="col-span-4 flex justify-center items-center h-full w-full">
           <AdsrVisualizer
             gain={defaultValues?.gain ?? 1}
             attack={defaultValues?.attack ?? 0.01}

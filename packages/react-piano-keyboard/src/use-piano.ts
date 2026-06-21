@@ -4,18 +4,20 @@ import { useKeyMapping } from "./use-piano/use-key-mapping";
 import { useKeyboardInput } from "@react-piano-keyboard/piano-keyboard";
 import {
   Pitches,
-  OctaveRows,
-  getKeyToNoteMap,
-  getTwoRowKeyToNoteMap,
   getPitchRangeForWhiteKeyCount,
   getPitchRange,
   pitchToIndex,
   indexToPitch,
+} from "@react-piano-keyboard/music";
+import {
+  OctaveRows,
+  getKeyToNoteMap,
+  getTwoRowKeyToNoteMap,
+} from "@react-piano-keyboard/piano-keyboard";
+import {
   OscillatorConfig,
-  DEFAULT_OSCILLATOR_COUNT,
-  DEFAULT_OSCILLATOR_CONFIG,
   LfoTarget,
-} from "@react-piano-keyboard/shared";
+} from "@react-piano-keyboard/audio";
 
 export type UsePianoOptions = {
   rows?: 1 | 2;
@@ -40,7 +42,10 @@ export type UsePianoOptions = {
   enabled?: boolean;
 };
 
-const getDefaultEnd = (startPitch: Pitches.Pitch, rows: 1 | 2): Pitches.Pitch => {
+const getDefaultEnd = (
+  startPitch: Pitches.Pitch,
+  rows: 1 | 2,
+): Pitches.Pitch => {
   const startIndex = pitchToIndex(startPitch);
   if (rows === 2) {
     const maxWhite = Math.max(
@@ -94,7 +99,7 @@ export const usePiano = ({
     if (!isTwoRow) return [];
     const topStart: Pitches.Pitch =
       typeof startProp === "object"
-        ? startProp.top ?? startPitch
+        ? (startProp.top ?? startPitch)
         : startPitch;
     return getPitchRangeForWhiteKeyCount(
       topStart,
@@ -126,7 +131,9 @@ export const usePiano = ({
     return allNotes.filter((n) => mappedSet.has(n));
   }, [allNotes, defaultMap, end]);
 
-  const rowNotes = useMemo((): readonly [Pitches.Pitch[], Pitches.Pitch[]] | undefined => {
+  const rowNotes = useMemo(():
+    | readonly [Pitches.Pitch[], Pitches.Pitch[]]
+    | undefined => {
     if (!isTwoRow) return undefined;
     return [bottomNotes, topNotes] as const;
   }, [isTwoRow, bottomNotes, topNotes]);

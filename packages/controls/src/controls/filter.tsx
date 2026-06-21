@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { isFilterType } from "@react-piano-keyboard/shared";
+import { isFilterType } from "@react-piano-keyboard/audio";
 import { Slider } from "./shared/slider";
 import { Picker, type PickerOption } from "./shared/picker";
 import { FilterVisualizer } from "./filter/filter-visualizer";

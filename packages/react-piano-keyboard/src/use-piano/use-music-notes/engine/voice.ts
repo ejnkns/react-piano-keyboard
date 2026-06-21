@@ -1,7 +1,5 @@
-import {
-  type OscillatorConfig,
-  type Pitches,
-} from "@react-piano-keyboard/shared";
+import { type OscillatorConfig } from "@react-piano-keyboard/audio";
+import type { Pitches as MusicPitches } from "@react-piano-keyboard/music";
 
 export type OscillatorVoice = {
   osc: OscillatorNode;
@@ -11,7 +9,7 @@ export type OscillatorVoice = {
 
 export type ActiveVoice = {
   voiceId: number;
-  note: Pitches.Pitch;
+  note: MusicPitches.Pitch;
   released: boolean;
   oscillators: OscillatorVoice[];
   filterNode: BiquadFilterNode;

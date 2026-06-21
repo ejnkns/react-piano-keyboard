@@ -77,7 +77,7 @@ export const Picker = ({
       {label && (
         <span
           id={labelId}
-          className="text-[10px] font-semibold text-piano-text-muted tracking-wider uppercase font-mono"
+          className="whitespace-nowrap text-[10px] font-semibold text-piano-text-muted tracking-wider uppercase font-mono"
         >
           {label}
         </span>

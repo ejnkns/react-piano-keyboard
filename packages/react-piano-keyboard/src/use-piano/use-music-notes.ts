@@ -1,15 +1,24 @@
-import { useEffect, useMemo, useReducer, useState, useRef, useCallback } from "react";
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import {
   Pitches,
   pitchToFrequency,
+  MAX_OCTAVE,
+  PITCH_CLASSES,
+} from "@react-piano-keyboard/music";
+import {
   DEFAULT_OSCILLATOR_CONFIG,
   DEFAULT_OSCILLATOR_COUNT,
   type OscillatorConfig,
   MAX_GAIN,
   SMOOTH_IN_INTERVAL,
   SMOOTH_OUT_INTERVAL,
-  MAX_OCTAVE,
-  PITCH_CLASSES,
   Waveforms,
   DEFAULT_FILTER_CUTOFF,
   DEFAULT_FILTER_RESONANCE,
@@ -23,7 +32,7 @@ import {
   DEFAULT_ANALOG_CLIP_DRIVE,
   DEFAULT_ANALOG_CLIP_INPUT,
   type LfoTarget,
-} from "@react-piano-keyboard/shared";
+} from "@react-piano-keyboard/audio";
 import { createAudioEngine, type ActiveVoice } from "./use-music-notes/engine";
 
 export namespace Audio {
@@ -233,7 +242,10 @@ export const useMusicNotes = ({
           drive: opts.analogClipDrive,
           input: opts.analogClipInput,
         });
-        engine.updateAnalogClipEnabled(opts.analogClipEnabled, opts.analogClipDrive);
+        engine.updateAnalogClipEnabled(
+          opts.analogClipEnabled,
+          opts.analogClipDrive,
+        );
         nodes.tremoloGain.connect(clipNodes.input);
 
         const voiceId = ++voiceIdCounter.current;
@@ -261,7 +273,10 @@ export const useMusicNotes = ({
           rate: opts.lfoRate,
           depth: opts.lfoDepth,
         });
-        engine.connectLfoToVoice(voice, opts.lfoEnabled ? opts.lfoTarget : "none");
+        engine.connectLfoToVoice(
+          voice,
+          opts.lfoEnabled ? opts.lfoTarget : "none",
+        );
 
         setPlayingNotes((prev) =>
           prev.includes(note) ? prev : [...prev, note],
@@ -372,17 +387,28 @@ export const useMusicNotes = ({
       const T = 0.02;
 
       // --- Oscillator count reduction cleanup ---
-      if (options.oscillatorCount !== undefined && options.oscillatorCount < prev.oscillatorCount) {
+      if (
+        options.oscillatorCount !== undefined &&
+        options.oscillatorCount < prev.oscillatorCount
+      ) {
         const count = options.oscillatorCount;
         const prevCount = prev.oscillatorCount;
         voices.forEach(({ oscillators }) => {
           for (let i = count; i < prevCount; i++) {
             const oscv = oscillators[i];
             if (!oscv) continue;
-            try { oscv.osc.stop(); } catch {}
-            try { oscv.osc.disconnect(); } catch {}
-            try { oscv.gain.disconnect(); } catch {}
-            try { oscv.pan.disconnect(); } catch {}
+            try {
+              oscv.osc.stop();
+            } catch {}
+            try {
+              oscv.osc.disconnect();
+            } catch {}
+            try {
+              oscv.gain.disconnect();
+            } catch {}
+            try {
+              oscv.pan.disconnect();
+            } catch {}
           }
         });
       }
@@ -395,12 +421,17 @@ export const useMusicNotes = ({
           voices.forEach(({ oscillators: oscs, note }) => {
             const oscv = oscs[i];
             if (!oscv) return;
-            if (config.waveform !== prevConfig.waveform) oscv.osc.type = config.waveform;
-            if (config.gain !== prevConfig.gain) oscv.gain.gain.setTargetAtTime(config.gain, time, T);
-            if (config.detune !== prevConfig.detune) oscv.osc.detune.setTargetAtTime(config.detune, time, T);
-            if (config.pan !== prevConfig.pan) oscv.pan.pan.setTargetAtTime(config.pan, time, T);
+            if (config.waveform !== prevConfig.waveform)
+              oscv.osc.type = config.waveform;
+            if (config.gain !== prevConfig.gain)
+              oscv.gain.gain.setTargetAtTime(config.gain, time, T);
+            if (config.detune !== prevConfig.detune)
+              oscv.osc.detune.setTargetAtTime(config.detune, time, T);
+            if (config.pan !== prevConfig.pan)
+              oscv.pan.pan.setTargetAtTime(config.pan, time, T);
             if (config.octave !== prevConfig.octave) {
-              oscv.osc.frequency.value = pitchToFrequency(note) * Math.pow(2, config.octave);
+              oscv.osc.frequency.value =
+                pitchToFrequency(note) * Math.pow(2, config.octave);
             }
           });
         });
@@ -409,20 +440,31 @@ export const useMusicNotes = ({
       // --- Filter live modulation ---
       if (options.filterCutoff !== undefined) {
         voices.forEach(({ filterNode }) =>
-          filterNode.frequency.setTargetAtTime(options.filterCutoff!, time, T));
+          filterNode.frequency.setTargetAtTime(options.filterCutoff!, time, T),
+        );
       }
       if (options.filterResonance !== undefined) {
         voices.forEach(({ filterNode }) =>
-          filterNode.Q.setTargetAtTime(options.filterResonance!, time, T));
+          filterNode.Q.setTargetAtTime(options.filterResonance!, time, T),
+        );
       }
       if (options.filterType !== undefined) {
-        voices.forEach(({ filterNode }) => filterNode.type = options.filterType!);
+        voices.forEach(
+          ({ filterNode }) => (filterNode.type = options.filterType!),
+        );
       }
 
       // --- Filter bypass ---
-      if (options.filterEnabled !== undefined && options.filterEnabled !== prev.filterEnabled) {
-        const fc = options.filterEnabled ? (options.filterCutoff ?? prev.filterCutoff) : 22050;
-        const fr = options.filterEnabled ? (options.filterResonance ?? prev.filterResonance) : 0.1;
+      if (
+        options.filterEnabled !== undefined &&
+        options.filterEnabled !== prev.filterEnabled
+      ) {
+        const fc = options.filterEnabled
+          ? (options.filterCutoff ?? prev.filterCutoff)
+          : 22050;
+        const fr = options.filterEnabled
+          ? (options.filterResonance ?? prev.filterResonance)
+          : 0.1;
         voices.forEach(({ filterNode }) => {
           filterNode.frequency.setTargetAtTime(fc, time, T);
           filterNode.Q.setTargetAtTime(fr, time, T);
@@ -430,7 +472,10 @@ export const useMusicNotes = ({
       }
 
       // --- ADSR bypass ---
-      if (options.adsrEnabled !== undefined && options.adsrEnabled !== prev.adsrEnabled) {
+      if (
+        options.adsrEnabled !== undefined &&
+        options.adsrEnabled !== prev.adsrEnabled
+      ) {
         if (!options.adsrEnabled) {
           voices.forEach(({ envGain }) => {
             envGain.gain.cancelScheduledValues(time);
@@ -442,50 +487,49 @@ export const useMusicNotes = ({
 
       // --- LFO ---
       if (options.lfoRate !== undefined) engine.updateLfoRate(options.lfoRate);
-      if (options.lfoDepth !== undefined) engine.updateLfoDepth(options.lfoDepth);
-      if (options.lfoWaveform !== undefined) engine.updateLfoWaveform(options.lfoWaveform);
-      if (options.lfoTarget !== undefined) engine.relinkLfo(options.lfoTarget, voices);
+      if (options.lfoDepth !== undefined)
+        engine.updateLfoDepth(options.lfoDepth);
+      if (options.lfoWaveform !== undefined)
+        engine.updateLfoWaveform(options.lfoWaveform);
+      if (options.lfoTarget !== undefined)
+        engine.relinkLfo(options.lfoTarget, voices);
 
       // --- LFO bypass ---
-      if (options.lfoEnabled !== undefined && options.lfoEnabled !== prev.lfoEnabled) {
-        engine.relinkLfo(options.lfoEnabled ? optsRef.current.lfoTarget : "none", voices);
+      if (
+        options.lfoEnabled !== undefined &&
+        options.lfoEnabled !== prev.lfoEnabled
+      ) {
+        engine.relinkLfo(
+          options.lfoEnabled ? optsRef.current.lfoTarget : "none",
+          voices,
+        );
       }
 
       // --- Analog Clip ---
-      if (options.analogClipDrive !== undefined) engine.updateAnalogClipDrive(options.analogClipDrive);
-      if (options.analogClipInput !== undefined) engine.updateAnalogClipInput(options.analogClipInput);
+      if (options.analogClipDrive !== undefined)
+        engine.updateAnalogClipDrive(options.analogClipDrive);
+      if (options.analogClipInput !== undefined)
+        engine.updateAnalogClipInput(options.analogClipInput);
 
       // --- Analog Clip bypass ---
-      if (options.analogClipEnabled !== undefined && options.analogClipEnabled !== prev.analogClipEnabled) {
-        engine.updateAnalogClipEnabled(options.analogClipEnabled, optsRef.current.analogClipDrive);
+      if (
+        options.analogClipEnabled !== undefined &&
+        options.analogClipEnabled !== prev.analogClipEnabled
+      ) {
+        engine.updateAnalogClipEnabled(
+          options.analogClipEnabled,
+          optsRef.current.analogClipDrive,
+        );
       }
     },
     [engine, getAudioContext],
   );
-
-  const frequenciesState = useMemo(() => {
-    const keys = [...Array(MAX_OCTAVE).keys()].flatMap((octave) =>
-      PITCH_CLASSES.map((note) => `${note}${octave}` as Pitches.Pitch),
-    );
-
-    return keys.map((key) => {
-      const isPlaying = playingNotes.includes(key);
-      return {
-        hz: pitchToFrequency(key),
-        gain: synthUI.gain,
-        oscillators: synthUI.oscillators.map((c) => c.waveform),
-        playing: isPlaying,
-        touched: isPlaying,
-      };
-    });
-  }, [playingNotes, synthUI.oscillators, synthUI.gain]);
 
   return {
     start,
     stop,
     stopAll,
     set,
-    state: frequenciesState,
     controlValues: synthUI,
     playingNotes,
     envelopeActivity,
