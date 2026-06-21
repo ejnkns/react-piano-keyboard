@@ -32,47 +32,9 @@ import {
   DEFAULT_ANALOG_CLIP_DRIVE,
   DEFAULT_ANALOG_CLIP_INPUT,
   type LfoTarget,
-} from "@react-piano-keyboard/audio";
+} from "./defaults";
+import type { Audio, UseMusicNotesOptions } from "./types";
 import { createAudioEngine, type ActiveVoice } from "./use-music-notes/engine";
-
-export namespace Audio {
-  export type FrequencyState = {
-    oscillators: Waveforms.Oscillator[];
-    gain: number;
-    hz: number;
-    playing: boolean;
-    touched: boolean;
-  };
-
-  export type SetOptions = {
-    oscillatorCount?: 1 | 2;
-    oscillators?: OscillatorConfig[];
-    gain?: number;
-    attack?: number;
-    decay?: number;
-    sustain?: number;
-    release?: number;
-    filterCutoff?: number;
-    filterResonance?: number;
-    filterType?: BiquadFilterType;
-    lfoRate?: number;
-    lfoDepth?: number;
-    lfoTarget?: LfoTarget;
-    lfoWaveform?: OscillatorType;
-    analogClipDrive?: number;
-    analogClipInput?: number;
-    adsrEnabled?: boolean;
-    filterEnabled?: boolean;
-    lfoEnabled?: boolean;
-    analogClipEnabled?: boolean;
-  };
-}
-
-type UseKeyboardProps = Audio.SetOptions & {
-  initialFrequencyStates?: Audio.FrequencyState[];
-  audioContext?: AudioContext;
-  analyserNode?: AnalyserNode;
-};
 
 const DEFAULT_OSCS = [DEFAULT_OSCILLATOR_CONFIG, DEFAULT_OSCILLATOR_CONFIG];
 
@@ -127,7 +89,7 @@ export const useMusicNotes = ({
   analogClipInput: defaultAnalogClipInput = DEFAULT_ANALOG_CLIP_INPUT,
   audioContext,
   analyserNode,
-}: UseKeyboardProps = {}) => {
+}: UseMusicNotesOptions = {}) => {
   const initSynthState: Required<Audio.SetOptions> = {
     ...UI_INITIAL_STATE,
     oscillatorCount: defaultOscCount,

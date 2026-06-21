@@ -1,4 +1,4 @@
-import type { OscillatorConfig, ControlValues } from "@react-piano-keyboard/audio";
+import type { OscillatorConfig, ControlValues } from "./defaults";
 
 export type Preset = {
   name: string;

@@ -27,6 +27,21 @@
       "import": "./dist/music.mjs",
       "require": "./dist/music.cjs"
     },
+    "./audio": {
+      "types": "./dist/audio.d.ts",
+      "import": "./dist/audio.mjs",
+      "require": "./dist/audio.cjs"
+    },
+    "./audio/defaults": {
+      "types": "./dist/audio-defaults.d.ts",
+      "import": "./dist/audio-defaults.mjs",
+      "require": "./dist/audio-defaults.cjs"
+    },
+    "./audio/presets": {
+      "types": "./dist/audio-presets.d.ts",
+      "import": "./dist/audio-presets.mjs",
+      "require": "./dist/audio-presets.cjs"
+    },
     "./types": {
       "types": "./dist/types.d.ts",
       "import": "./dist/types.mjs",

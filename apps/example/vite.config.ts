@@ -77,10 +77,52 @@ export default defineConfig({
         ),
       },
       {
+        find: /^react-piano-keyboard\/audio\/defaults$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/react-piano-keyboard/src/audio-defaults.ts",
+        ),
+      },
+      {
+        find: /^react-piano-keyboard\/audio\/presets$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/react-piano-keyboard/src/audio-presets.ts",
+        ),
+      },
+      {
+        find: /^react-piano-keyboard\/audio$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/react-piano-keyboard/src/audio.ts",
+        ),
+      },
+      {
         find: /^@react-piano-keyboard\/music$/,
         replacement: path.resolve(
           __dirname,
           "../../packages/music/src/index.ts",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/audio\/defaults$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/audio/src/defaults.ts",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/audio\/presets$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/audio/src/presets.ts",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/audio$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/audio/src/index.ts",
         ),
       },
       {

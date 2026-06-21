@@ -4,7 +4,7 @@ import {
   LFO_TARGETS,
   isLfoTarget,
   type LfoTarget,
-} from "@react-piano-keyboard/audio";
+} from "@react-piano-keyboard/audio/defaults";
 import { Slider } from "./shared/slider";
 import { WavePicker } from "./shared/wave-picker";
 import { Picker, type PickerOption } from "./shared/picker";

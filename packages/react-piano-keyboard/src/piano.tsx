@@ -10,8 +10,11 @@ import {
   MasterWaveformVisualizer,
 } from "@react-piano-keyboard/controls";
 import { Pitches } from "@react-piano-keyboard/music";
-import { LfoTarget, OscillatorConfig } from "@react-piano-keyboard/audio";
-import { Audio } from "./use-piano/use-music-notes";
+import type {
+  Audio,
+  LfoTarget,
+  OscillatorConfig,
+} from "@react-piano-keyboard/audio";
 
 export namespace Piano {
   export type Props = {

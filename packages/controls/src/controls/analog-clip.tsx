@@ -1,7 +1,7 @@
 import { Slider } from "./shared/slider";
 import { AnalogClipVisualizer } from "./analog-clip/analog-clip-visualizer";
 import type { SetFn } from "../controls-types";
-import type { ControlValues } from "@react-piano-keyboard/audio";
+import type { ControlValues } from "@react-piano-keyboard/audio/defaults";
 
 export type AnalogClipHandlers = {
   analogClipDrive: (v: number) => void;

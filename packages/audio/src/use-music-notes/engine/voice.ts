@@ -1,4 +1,4 @@
-import { type OscillatorConfig } from "@react-piano-keyboard/audio";
+import type { OscillatorConfig } from "../../defaults";
 import type { Pitches as MusicPitches } from "@react-piano-keyboard/music";
 
 export type OscillatorVoice = {

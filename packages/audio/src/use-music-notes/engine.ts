@@ -1,4 +1,4 @@
-import { type LfoTarget } from "@react-piano-keyboard/audio";
+import type { LfoTarget } from "../defaults";
 import {
   ensureAnalogClip,
   updateAnalogClipDrive,

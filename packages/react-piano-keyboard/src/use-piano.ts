@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMusicNotes } from "./use-piano/use-music-notes";
+import { useMusicNotes } from "@react-piano-keyboard/audio";
 import { useKeyMapping } from "./use-piano/use-key-mapping";
 import { useKeyboardInput } from "@react-piano-keyboard/piano-keyboard";
 import {
@@ -14,7 +14,7 @@ import {
   getKeyToNoteMap,
   getTwoRowKeyToNoteMap,
 } from "@react-piano-keyboard/piano-keyboard";
-import {
+import type {
   OscillatorConfig,
   LfoTarget,
 } from "@react-piano-keyboard/audio";

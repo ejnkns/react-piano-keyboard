@@ -16,11 +16,15 @@
       "types": "./dist/defaults.d.ts",
       "import": "./dist/defaults.mjs",
       "require": "./dist/defaults.cjs"
+    },
+    "./presets": {
+      "types": "./dist/presets.d.ts",
+      "import": "./dist/presets.mjs",
+      "require": "./dist/presets.cjs"
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "build": "vite build",
@@ -29,8 +33,12 @@
   "dependencies": {
     "@react-piano-keyboard/music": "*"
   },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
   "license": "MIT",
   "devDependencies": {
+    "@types/react": "^19.0.0",
     "postcss-load-config": "^5.1.0",
     "tailwindcss": "^4.3.1"
   }

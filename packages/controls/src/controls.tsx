@@ -16,7 +16,7 @@ import {
   getAnalogClipHandlers,
 } from "./controls/analog-clip";
 import type { SetFn } from "./controls-types";
-import type { ControlValues } from "@react-piano-keyboard/audio";
+import type { ControlValues } from "@react-piano-keyboard/audio/defaults";
 
 export const Controls = ({
   set,
