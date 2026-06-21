@@ -5,32 +5,62 @@
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/controls.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/controls.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
+    },
+    "./visualizers": {
+      "types": "./dist/visualizers.d.ts",
+      "import": "./dist/visualizers.mjs",
+      "require": "./dist/visualizers.cjs"
+    },
+    "./primitives": {
+      "types": "./dist/primitives.d.ts",
+      "import": "./dist/primitives.mjs",
+      "require": "./dist/primitives.cjs"
     },
     "./styles.css": "./dist/controls.css"
   },
   "files": [
     "dist",
-    "src"
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
   ],
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-piano-keyboard/audio": "*",
-    "@react-piano-keyboard/music": "*"
+    "@react-piano-keyboard/audio": "^0.1.0",
+    "@react-piano-keyboard/music": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
+  "keywords": [
+    "react",
+    "synthesizer",
+    "controls",
+    "audio-visualization"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ejnkns/react-piano-keyboard.git",
+    "directory": "packages/controls"
+  },
+  "homepage": "https://github.com/ejnkns/react-piano-keyboard#readme",
+  "bugs": "https://github.com/ejnkns/react-piano-keyboard/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "postcss-load-config": "^5.1.0",
     "tailwindcss": "^4.3.1"

@@ -5,8 +5,12 @@ import {
   FourKeyboardRowWhiteKeys,
   FourKeyboardRowNotesLength,
   OctaveRows,
-} from "./keyboard-layout";
-import { pitchToIndex, indexToPitch, Pitches } from "@react-piano-keyboard/music";
+} from "./computer-keyboard-layout";
+import {
+  pitchToIndex,
+  indexToPitch,
+  Pitches,
+} from "@react-piano-keyboard/music";
 
 const isWhite = (note: Pitches.Pitch) => !note.includes("#");
 
@@ -95,8 +99,7 @@ export const getTwoRowKeyToNoteMap = (
   const topStart = topNotes[0];
   if (topStart) {
     const pitchClass = topStart.replace(/\d/, "");
-    const offset =
-      pitchClass === "C" || pitchClass === "F" ? 1 : 2;
+    const offset = pitchClass === "C" || pitchClass === "F" ? 1 : 2;
     const qIdx = pitchToIndex(topStart) - offset;
     if (qIdx >= 0) {
       const precedingWhite = indexToPitch(qIdx);

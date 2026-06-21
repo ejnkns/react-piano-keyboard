@@ -14,10 +14,11 @@ function tanhClip(x: number, drive: number): number {
   return Math.max(-1, Math.min(1, val));
 }
 
-const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
-  getComputedStyle(el)
-    .getPropertyValue(name)
-    .trim() || fallback;
+const resolveCSSVar = (
+  name: string,
+  fallback: string,
+  el: Element = document.documentElement,
+) => getComputedStyle(el).getPropertyValue(name).trim() || fallback;
 
 export const AnalogClipVisualizer = ({
   drive,
@@ -39,8 +40,16 @@ export const AnalogClipVisualizer = ({
 
     let cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
     let cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-    let cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
-    let cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+    let cachedBorderColor = resolveCSSVar(
+      "--piano-border-strong",
+      "#27272a",
+      canvas,
+    );
+    let cachedTextColor = resolveCSSVar(
+      "--piano-text-muted",
+      "#a1a1aa",
+      canvas,
+    );
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
@@ -107,7 +116,11 @@ export const AnalogClipVisualizer = ({
     const observer = new MutationObserver(() => {
       cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
       cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-      cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+      cachedBorderColor = resolveCSSVar(
+        "--piano-border-strong",
+        "#27272a",
+        canvas,
+      );
       cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
       draw();
     });

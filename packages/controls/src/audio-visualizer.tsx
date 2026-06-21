@@ -17,7 +17,7 @@ export const AudioVisualizer = ({ data }: { data: AudioEnvelope[] }) => {
     const width = canvas.width;
     const height = canvas.height;
 
-    // This is meant to be a simple state visualizer, 
+    // This is meant to be a simple state visualizer,
     // rendering the current activity data.
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "var(--piano-accent)";

@@ -3,51 +3,25 @@ import {
   getKeyToNoteMap,
   getTwoRowKeyToNoteMap,
   mapNotesToRow,
-} from "../keyboard-mapping";
-import { OctaveRows } from "../keyboard-layout";
-import { getPitchRange, getPitchRangeForWhiteKeyCount } from "@react-piano-keyboard/music";
+} from "./keyboard-mapping";
+import { OctaveRows } from "./computer-keyboard-layout";
+import { getPitchRange, type Pitches } from "@react-piano-keyboard/music";
+import { getPianoKeyboardLayout } from "./get-piano-keyboard-layout";
 
-describe("getPitchRangeForWhiteKeyCount", () => {
-  it("returns empty array for zero white keys", () => {
-    expect(getPitchRangeForWhiteKeyCount("C3", 0)).toEqual([]);
-  });
+const getPitchRangeForWhiteKeyCount = (
+  start: Pitches.Pitch,
+  whiteKeyCount: number,
+) => {
+  if (whiteKeyCount === 0) return [];
 
-  it("returns one white key from C3", () => {
-    const r = getPitchRangeForWhiteKeyCount("C3", 1);
-    expect(r).toEqual(["C3"]);
+  const notes = getPianoKeyboardLayout({ start }).notes;
+  let whiteNotesSeen = 0;
+  const endIndex = notes.findIndex((note) => {
+    if (!note.includes("#")) whiteNotesSeen++;
+    return whiteNotesSeen === whiteKeyCount;
   });
-
-  it("returns two white keys from D3", () => {
-    const r = getPitchRangeForWhiteKeyCount("D3", 2);
-    expect(r).toEqual(["D3", "D#3", "E3"]);
-  });
-
-  it("returns exactly 11 white keys from C3 through F4", () => {
-    const r = getPitchRangeForWhiteKeyCount("C3", 11);
-    expect(r[0]).toBe("C3");
-    expect(r[r.length - 1]).toBe("F4");
-    expect(r.filter((n) => !n.includes("#")).length).toBe(11);
-  });
-
-  it("returns exactly 11 white keys from E3 through A4", () => {
-    const r = getPitchRangeForWhiteKeyCount("E3", 11);
-    expect(r[0]).toBe("E3");
-    expect(r[r.length - 1]).toBe("A4");
-    expect(r.filter((n) => !n.includes("#")).length).toBe(11);
-  });
-
-  it("returns 7 white keys from C3 (one octave, C3-B3)", () => {
-    const r = getPitchRangeForWhiteKeyCount("C3", 7);
-    expect(r[0]).toBe("C3");
-    expect(r[r.length - 1]).toBe("B3");
-    expect(r.filter((n) => !n.includes("#")).length).toBe(7);
-  });
-
-  it("handles a black key as the start (C#3)", () => {
-    const r = getPitchRangeForWhiteKeyCount("C#3", 2);
-    expect(r.filter((n) => !n.includes("#")).length).toBe(2);
-  });
-});
+  return endIndex < 0 ? notes : notes.slice(0, endIndex + 1);
+};
 
 describe("mapNotesToRow", () => {
   it("maps bottom row C3-F4 starting at white index 0", () => {

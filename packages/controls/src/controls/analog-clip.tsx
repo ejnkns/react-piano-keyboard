@@ -1,5 +1,5 @@
-import { Slider } from "./shared/slider";
-import { AnalogClipVisualizer } from "./analog-clip/analog-clip-visualizer";
+import { Slider } from "../slider";
+import { AnalogClipVisualizer } from "../analog-clip-visualizer";
 import type { SetFn } from "../controls-types";
 import type { ControlValues } from "@react-piano-keyboard/audio/defaults";
 

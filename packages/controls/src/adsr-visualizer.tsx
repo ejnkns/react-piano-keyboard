@@ -28,13 +28,25 @@ function freqOpacity(freq: number, minFreq: number, maxFreq: number): number {
   const norm =
     (Math.log2(freq) - Math.log2(minFreq)) /
     (Math.log2(maxFreq) - Math.log2(minFreq));
-  return Math.min(1, Math.max(MIN_OPACITY, MIN_OPACITY + norm * (1 - MIN_OPACITY)));
+  return Math.min(
+    1,
+    Math.max(MIN_OPACITY, MIN_OPACITY + norm * (1 - MIN_OPACITY)),
+  );
 }
 
 function computeDotPos(
   entry: EnvelopeEntry,
   p: { attack: number; decay: number; sustain: number; release: number },
-  l: { x0: number; x1: number; x2: number; x3: number; x4: number; yTop: number; yBot: number; sustainY: number },
+  l: {
+    x0: number;
+    x1: number;
+    x2: number;
+    x3: number;
+    x4: number;
+    yTop: number;
+    yBot: number;
+    sustainY: number;
+  },
   now: number,
 ): { x: number; y: number } | null {
   if (entry.noteOffAt !== null) {
@@ -61,10 +73,11 @@ function computeDotPos(
   return { x: l.x3, y: l.sustainY };
 }
 
-const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
-  getComputedStyle(el)
-    .getPropertyValue(name)
-    .trim() || fallback;
+const resolveCSSVar = (
+  name: string,
+  fallback: string,
+  el: Element = document.documentElement,
+) => getComputedStyle(el).getPropertyValue(name).trim() || fallback;
 
 export const AdsrVisualizer = ({
   gain,
@@ -74,17 +87,28 @@ export const AdsrVisualizer = ({
   release,
   activity,
   noteRange,
-}: Envelope & { activity?: Record<number, EnvelopeEntry>; noteRange?: { min: string; max: string } }) => {
+}: Envelope & {
+  activity?: Record<number, EnvelopeEntry>;
+  noteRange?: { min: string; max: string };
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const minFreq = useMemo(() => {
     if (!noteRange) return MIN_FREQ;
-    try { return pitchToFrequency(noteRange.min as any); } catch { return MIN_FREQ; }
+    try {
+      return pitchToFrequency(noteRange.min as any);
+    } catch {
+      return MIN_FREQ;
+    }
   }, [noteRange?.min]);
 
   const maxFreq = useMemo(() => {
     if (!noteRange) return MAX_FREQ;
-    try { return pitchToFrequency(noteRange.max as any); } catch { return MAX_FREQ; }
+    try {
+      return pitchToFrequency(noteRange.max as any);
+    } catch {
+      return MAX_FREQ;
+    }
   }, [noteRange?.max]);
 
   useEffect(() => {
@@ -101,13 +125,25 @@ export const AdsrVisualizer = ({
 
     let cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
     let cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-    let cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
-    let cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+    let cachedBorderColor = resolveCSSVar(
+      "--piano-border-strong",
+      "#27272a",
+      canvas,
+    );
+    let cachedTextColor = resolveCSSVar(
+      "--piano-text-muted",
+      "#a1a1aa",
+      canvas,
+    );
 
     const observer = new MutationObserver(() => {
       cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
       cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-      cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+      cachedBorderColor = resolveCSSVar(
+        "--piano-border-strong",
+        "#27272a",
+        canvas,
+      );
       cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
     });
     observer.observe(document.documentElement, {
@@ -244,7 +280,11 @@ export const AdsrVisualizer = ({
           );
           if (pos) {
             let freq: number;
-            try { freq = pitchToFrequency(entry.note as any); } catch { freq = 440; }
+            try {
+              freq = pitchToFrequency(entry.note as any);
+            } catch {
+              freq = 440;
+            }
             const opacity = freqOpacity(freq, minFreq, maxFreq);
 
             ctx.fillStyle = cachedAccentColor;

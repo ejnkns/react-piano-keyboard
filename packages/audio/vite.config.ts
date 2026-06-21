@@ -16,7 +16,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        index: resolve(__dirname, "src/index.ts"),
+        index: resolve(__dirname, "src/audio.ts"),
         defaults: resolve(__dirname, "src/defaults.ts"),
         presets: resolve(__dirname, "src/presets.ts"),
       },

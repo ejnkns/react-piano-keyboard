@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { SetFn } from "../controls-types";
-import { Picker } from "./shared/picker";
+import type { SetFn } from "./controls-types";
+import { Picker } from "./picker";
 import { PRESETS } from "@react-piano-keyboard/audio/presets";
 
 export const PresetPicker = ({ set }: { set: SetFn }) => {

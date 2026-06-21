@@ -1,15 +1,17 @@
-import { useMemo, useState, useEffect } from "react";
-import "./index.css";
+import { useState, useEffect } from "react";
+import "./react-piano-keyboard.css";
 import { usePiano } from "./use-piano";
-import { PianoNotes } from "@react-piano-keyboard/piano-keyboard";
+import {
+  PianoKeyboard,
+  type PianoKeyboardInputMode,
+} from "@react-piano-keyboard/piano-keyboard";
 import {
   Controls,
   type ControlSection,
   type SetFn,
   WaveformVisualizer,
-  MasterWaveformVisualizer,
 } from "@react-piano-keyboard/controls";
-import { Pitches } from "@react-piano-keyboard/music";
+import type { Pitches } from "@react-piano-keyboard/music";
 import type {
   Audio,
   LfoTarget,
@@ -21,6 +23,7 @@ export namespace Piano {
     rows?: 1 | 2;
     start?: Pitches.Pitch | { bottom: Pitches.Pitch; top?: Pitches.Pitch };
     end?: Pitches.Pitch;
+    keyboardInput?: PianoKeyboardInputMode;
     controls?:
       | boolean
       | {
@@ -59,6 +62,7 @@ export function Piano({
   rows,
   start,
   end,
+  keyboardInput = "global",
   controls: controlsProp,
   waveform: waveformProp,
   audioContext,
@@ -122,7 +126,7 @@ export function Piano({
   const effectiveAudioContext = audioContext ?? localAudioContext ?? undefined;
   const effectiveAnalyserNode = analyserNode ?? localAnalyserNode ?? undefined;
 
-  const { notes, rowNotes, defaultMap, audio, mapping } = usePiano({
+  const { layout, audio, mapping } = usePiano({
     rows,
     start,
     end,
@@ -155,33 +159,6 @@ export function Piano({
       controlsOverrides.onClose();
     }
   };
-
-  const shared = {
-    audio: {
-      start: audio.start,
-      stop: audio.stop,
-      playingNotes: audio.playingNotes,
-    },
-    mapping: {
-      keyNoteMap: defaultMap,
-      customKeyMap: mapping.keyMap,
-      editMode: mapping.editMode,
-      selectedNote: mapping.selectedNote,
-      conflictNote: mapping.conflictNote,
-      onNoteSelect: mapping.selectNote,
-    },
-  };
-
-  const maxWhiteCount = useMemo(
-    () =>
-      rowNotes
-        ? Math.max(
-            rowNotes[0].filter((n) => !n.includes("#")).length,
-            rowNotes[1].filter((n) => !n.includes("#")).length,
-          )
-        : 0,
-    [rowNotes],
-  );
 
   return (
     <div
@@ -237,10 +214,7 @@ export function Piano({
             set={audio.set as SetFn}
             defaultValues={audio.controlValues}
             envelopeActivity={audio.envelopeActivity}
-            noteRange={{
-              min: notes[0] as string,
-              max: notes[notes.length - 1] as string,
-            }}
+            noteRange={layout.noteRange}
             onClose={
               isUncontrolled ? handlePowerOff : controlsOverrides?.onClose
             }
@@ -255,27 +229,25 @@ export function Piano({
       </div>
 
       <div className="piano-notes-well bg-piano-notes-well-bg px-3">
-        <div>
-          {rowNotes ? (
-            <>
-              <PianoNotes
-                id="piano-top"
-                notes={rowNotes[1]}
-                whiteCount={maxWhiteCount}
-                {...shared}
-              />
-              <PianoNotes
-                id="piano-bottom"
-                notes={rowNotes[0]}
-                whiteCount={maxWhiteCount}
-                {...shared}
-              />
-            </>
-          ) : (
-            <PianoNotes id="piano" notes={notes} {...shared} />
-          )}
-        </div>
+        <PianoKeyboard
+          rows={rows}
+          start={start}
+          end={end}
+          onNoteOn={audio.start}
+          onNoteOff={audio.stop}
+          playingNotes={audio.playingNotes}
+          keyMap={mapping.keyMap}
+          editMode={mapping.editMode}
+          onAssignKey={mapping.assignKey}
+          selectedNote={mapping.selectedNote}
+          conflictNote={mapping.conflictNote}
+          onNoteSelect={mapping.selectNote}
+          keyboardInput={isOn ? keyboardInput : false}
+        />
       </div>
     </div>
   );
 }
+
+export { usePiano } from "./use-piano";
+export type { UsePianoOptions } from "./use-piano";

@@ -1,5 +1,5 @@
-import { Slider } from "./shared/slider";
-import { AdsrVisualizer } from "./adsr-envelope/adsr-visualizer";
+import { Slider } from "../slider";
+import { AdsrVisualizer } from "../adsr-visualizer";
 import type { SetFn } from "../controls-types";
 
 export type AdsrHandlers = {
@@ -53,7 +53,10 @@ export function getAdsrEnvelopeSection({
     size: "full" as const,
     onToggle: handlers.adsrEnabled,
     group: (
-      <div className="bg-piano-bg-tertiary border border-piano-accent rounded p-2 h-full grid grid-cols-5 gap-4 items-center" style={{ width: "max-content" }}>
+      <div
+        className="bg-piano-bg-tertiary border border-piano-accent rounded p-2 h-full grid grid-cols-5 gap-4 items-center"
+        style={{ width: "max-content" }}
+      >
         {/* Row 1, Col 1: Empty */}
         <div />
 

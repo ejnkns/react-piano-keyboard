@@ -1,125 +1,83 @@
 # react-piano-keyboard
 
-A React piano keyboard component powered by the Web Audio API. Play notes with mouse/touch or the computer keyboard.
+A package family for building playable React pianos and Web Audio interfaces.
+Use the umbrella package for a complete instrument or install individual
+domain packages for custom layouts.
 
-## Installation
+## Packages
 
-```bash
-npm install react-piano-keyboard
-```
+| Package                                | Purpose                                             |
+| -------------------------------------- | --------------------------------------------------- |
+| `react-piano-keyboard`                 | Batteries-included piano and curated domain mirrors |
+| `@react-piano-keyboard/music`          | Framework-free pitch and frequency utilities        |
+| `@react-piano-keyboard/audio`          | Web Audio hooks, synth configuration, and presets   |
+| `@react-piano-keyboard/piano-keyboard` | Controlled piano rendering and keyboard bindings    |
+| `@react-piano-keyboard/controls`       | Synth controls, visualizers, and control primitives |
 
-## Usage
-
-### Quick start
+## Complete Piano
 
 ```tsx
 import { Piano } from "react-piano-keyboard";
+import "react-piano-keyboard/styles.css";
 
-<Piano />;
+export function Instrument() {
+  return <Piano controls waveform />;
+}
 ```
 
-The `<Piano>` component is uncontrolled by default. It creates its own `AudioContext` and manages note state, mapping, and keyboard input internally. Set `controls` or `waveform` to show the control panel and waveform visualizer. Each section (Filter, ADSR, LFO, Analog Clip) has an on/off toggle to bypass its processing.
+`Piano` creates its own `AudioContext` when one is not supplied. Computer-key
+input defaults to `"global"` and can be changed to `"scoped"` or `false`.
 
-### With custom hook (controlled)
+## Custom Composition
 
 ```tsx
-import {
-  PianoNotes,
-  Controls,
-  WaveformVisualizer,
-  usePiano,
-  useAudioContext,
-} from "react-piano-keyboard";
+import { Controls, PianoKeyboard, usePiano } from "react-piano-keyboard";
+import { WaveformVisualizer } from "react-piano-keyboard/visualizers";
+import "react-piano-keyboard/styles.css";
 
-function CustomPiano() {
-  const audioContext = useAudioContext();
-  const analyser = audioContext?.createAnalyser();
-
-  const { notes, audio, mapping, inputProps } = usePiano({
+export function CustomInstrument({
+  audioContext,
+}: {
+  audioContext: AudioContext;
+}) {
+  const analyserNode = audioContext.createAnalyser();
+  const { audio, keyboardProps, mapping } = usePiano({
     rows: 2,
-    start: "C3",
-    analyserNode: analyser,
+    start: { bottom: "C3", top: "C4" },
+    audioContext,
+    analyserNode,
   });
 
-  if (!audioContext) return null;
-
   return (
-    <div {...inputProps} tabIndex={0}>
-      <Controls set={audio.set} />
-      <WaveformVisualizer analyserNode={analyser} height={120} />
-      <PianoNotes id="piano" notes={notes} audio={audio} mapping={mapping} />
+    <div {...keyboardProps}>
+      <Controls set={audio.set} defaultValues={audio.controlValues} />
+      <WaveformVisualizer analyserNode={analyserNode} />
+      <PianoKeyboard
+        rows={2}
+        start={{ bottom: "C3", top: "C4" }}
+        keyboardInput={false}
+        onNoteOn={audio.start}
+        onNoteOff={audio.stop}
+        playingNotes={audio.playingNotes}
+        keyMap={mapping.keyMap}
+      />
     </div>
   );
 }
 ```
 
-### Full API
+Domain mirrors are available from `react-piano-keyboard/audio`, `/music`,
+`/piano`, `/piano-keyboard`, `/controls`, `/controls/primitives`, and
+`/visualizers`.
 
-```tsx
-import { Piano } from "react-piano-keyboard";
+## Development
 
-<Piano
-  rows={1 | 2}                             // default: 1
-  start={"C3" | { bottom: "C3", top?: "C4" }}  // default: "C3"
-  end={"C5"}                               // optional, only for rows=1
-  controls={true | { onClose, defaultValues, sections }}
-  waveform={true | { width, height, strokeColor, backgroundColor }}
-/>
+```bash
+npm install
+npm run typecheck
+npm run test
+npm run build
 ```
-
-## Exports
-
-| Import path                       | Exports                                                                                                                                                                                                                                                                |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `react-piano-keyboard`            | `Piano`, `PianoNotes`, `Controls`, `WaveformVisualizer`, `usePiano`, `useMusicNotes`, `useAudioContext`, `useKeyMapping`, `useKeyboardInput`, `pitchToFrequency`, `pitchToIndex`, `indexToPitch`, `getPitchRange`, `PITCH_CLASSES`, `Oscillator`, `Pitch`, types, etc. |
-| `react-piano-keyboard/hooks`      | `usePiano`, `useMusicNotes`, `useAudioContext`, `useKeyMapping`, `useKeyboardInput`                                                                                                                                                                                    |
-| `react-piano-keyboard/components` | `Piano`, `PianoNotes`, `Controls`, `WaveformVisualizer`                                                                                                                                                                                                                |
-| `react-piano-keyboard/types`      | `Pitch`, `PitchData`, `Oscillator`, `SetOptions`, etc.                                                                                                                                                                                                                 |
-| `react-piano-keyboard/pitches`    | `pitchToFrequency`, `pitchToIndex`, `indexToPitch`, `getPitchClass`, `getPitchRange`                                                                                                                                                                                   |
-| `react-piano-keyboard/constants`  | `A4`, `PITCH_CLASSES`, `WHITE_PITCH_CLASSES`, `DEFAULT_OSCILLATOR`, etc.                                                                                                                                                                                               |
-
-## Components
-
-- **`<Piano>`** — Uncontrolled piano component with optional controls panel and waveform visualizer.
-- **`<PianoNotes>`** — Renders piano keys (white/black notes) with mouse/touch interaction. Used by `<Piano>` internally. Accepts `notes`, `audio`, `mapping`, `whiteCount`.
-- **`<Controls>`** — Sections panel with oscillators (waveform, gain, detune, octave, pan per-oscillator), ADSR envelope, filter, LFO, analog clip, and presets. Each section (except Presets/Oscillators) has an on/off toggle that bypasses its processing. Each section has a live SVG visualizer. Use `sections` prop to show a subset.
-- **`<WaveformVisualizer>`** — Canvas-based oscilloscope display.
-
-## Hooks
-
-- **`usePiano(options?)`** — Main hook. Returns `{ notes, allNotes, rowNotes, defaultMap, audio, mapping, inputProps, rowConfigs }`.
-- **`useMusicNotes(options?)`** — Core synth hook. Manages `AudioContext`, oscillators, gain, ADSR envelope, filter, LFO, analog clip. Returns `{ start, stop, stopAll, set, state, controlValues, playingNotes, envelopeActivity }`. The `SetOptions` type includes `*Enabled` flags (`filterEnabled`, `adsrEnabled`, `lfoEnabled`, `analogClipEnabled`) to bypass each processing stage.
-- **`useAudioContext()`** — Singleton `AudioContext` manager.
-- **`useKeyMapping(notes)`** — Manages computer-key-to-note mapping with edit mode. Returns `{ keyMap, editMode, toggleEditMode, selectNote, assignKey, resetToDefaults }`.
-- **`useKeyboardInput(options)`** — Computer keyboard event handler. Returns `{ onKeyDown, onKeyUp }`.
-
-## Local Development
-
-This project is organized as an npm monorepo with workspaces:
-- `packages/react-piano-keyboard` — The core library.
-- `apps/example` — The demo application.
-
-To set up the project locally:
-1. Clone the repository and run `npm install` at the root.
-2. Start the hot-rebuilding dev environment: `npm run dev` (this starts the library compiler watch and the demo app server concurrently).
-3. Run the unit test suite: `npm run test`.
-4. Build all workspaces for production: `npm run build`.
-
-## Theme
-
-Override CSS custom properties on `:root` or `[data-theme="light"]`:
-
-```css
-:root {
-  --piano-accent: #3b82f6;
-  --piano-bg-primary: #1c1c1c;
-  --piano-bg-tertiary: #0a0a0a;
-  --piano-text-muted: #8a8a8a;
-  /* see index.css for full list */
-}
-```
-
-Set `data-theme="light"` on `<html>` for light mode.
 
 ## License
 

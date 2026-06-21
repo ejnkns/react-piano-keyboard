@@ -3,13 +3,22 @@ import { resolve } from "path";
 import dts from "vite-plugin-dts";
 
 export default defineConfig({
-  plugins: [dts({ include: ["src"] })],
+  plugins: [
+    dts({
+      include: ["src"],
+      exclude: ["src/**/*.test.ts", "src/controls/**", "src/wave-picker/**"],
+    }),
+  ],
   build: {
     cssCodeSplit: false,
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: {
+        index: resolve(__dirname, "src/controls.tsx"),
+        visualizers: resolve(__dirname, "src/visualizers.ts"),
+        primitives: resolve(__dirname, "src/primitives.ts"),
+      },
       formats: ["es", "cjs"],
-      fileName: (format) => `index.${format === "es" ? "mjs" : "cjs"}`,
+      fileName: (format, name) => `${name}.${format === "es" ? "mjs" : "cjs"}`,
     },
     rollupOptions: {
       external: [

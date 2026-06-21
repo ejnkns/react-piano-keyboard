@@ -17,4 +17,3 @@ export const PITCH_CLASSES = [
 export const WHITE_PITCH_CLASSES = ["C", "D", "E", "F", "G", "A", "B"] as const;
 export const OCTAVE_LENGTH = PITCH_CLASSES.length;
 export const DEFAULT_OCTAVE = 4;
-export const MAX_OCTAVE = 10;

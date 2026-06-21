@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
-  getComputedStyle(el)
-    .getPropertyValue(name)
-    .trim() || fallback;
+const resolveCSSVar = (
+  name: string,
+  fallback: string,
+  el: Element = document.documentElement,
+) => getComputedStyle(el).getPropertyValue(name).trim() || fallback;
 
 export const WaveformVisualizer = ({
   analyserNode,
@@ -43,12 +44,16 @@ export const WaveformVisualizer = ({
     const ro = new ResizeObserver(resize);
     if (parent) ro.observe(parent);
 
-    let cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
-    let cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+    let cachedBgColor =
+      backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
+    let cachedStrokeColor =
+      strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
 
     const observer = new MutationObserver(() => {
-      cachedBgColor = backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
-      cachedStrokeColor = strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
+      cachedBgColor =
+        backgroundColor ?? resolveCSSVar("--piano-waveform-bg", "#000", canvas);
+      cachedStrokeColor =
+        strokeColor ?? resolveCSSVar("--piano-accent", "#3b82f6", canvas);
     });
     observer.observe(document.documentElement, {
       attributes: true,

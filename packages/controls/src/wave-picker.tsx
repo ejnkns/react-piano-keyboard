@@ -1,5 +1,5 @@
 import { Picker, type PickerProps } from "./picker";
-import { Icon } from "./icon";
+import { Icon } from "./wave-picker/icon";
 
 export const WavePicker = (props: Omit<PickerProps, "children">) => (
   <Picker {...props}>

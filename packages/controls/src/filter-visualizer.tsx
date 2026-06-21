@@ -134,10 +134,11 @@ function magDb(
   return 10 * Math.log10(Math.max(magSq, 1e-10));
 }
 
-const resolveCSSVar = (name: string, fallback: string, el: Element = document.documentElement) =>
-  getComputedStyle(el)
-    .getPropertyValue(name)
-    .trim() || fallback;
+const resolveCSSVar = (
+  name: string,
+  fallback: string,
+  el: Element = document.documentElement,
+) => getComputedStyle(el).getPropertyValue(name).trim() || fallback;
 
 export const FilterVisualizer = ({
   filterType,
@@ -160,8 +161,16 @@ export const FilterVisualizer = ({
 
     let cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
     let cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-    let cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
-    let cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
+    let cachedBorderColor = resolveCSSVar(
+      "--piano-border-strong",
+      "#27272a",
+      canvas,
+    );
+    let cachedTextColor = resolveCSSVar(
+      "--piano-text-muted",
+      "#a1a1aa",
+      canvas,
+    );
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
@@ -170,8 +179,10 @@ export const FilterVisualizer = ({
 
       const logMin = Math.log10(MIN_FREQ);
       const logMax = Math.log10(MAX_FREQ);
-      const toX = (f: number) => pad.l + ((Math.log10(f) - logMin) / (logMax - logMin)) * pw;
-      const toY = (db: number) => pad.t + (1 - (db - MIN_DB) / (MAX_DB - MIN_DB)) * ph;
+      const toX = (f: number) =>
+        pad.l + ((Math.log10(f) - logMin) / (logMax - logMin)) * pw;
+      const toY = (db: number) =>
+        pad.t + (1 - (db - MIN_DB) / (MAX_DB - MIN_DB)) * ph;
 
       // Draw grid dB lines
       ctx.strokeStyle = cachedBorderColor;
@@ -188,7 +199,11 @@ export const FilterVisualizer = ({
         ctx.lineTo(pad.l + pw, y);
         ctx.stroke();
 
-        ctx.fillText(`${val > 0 ? "+" : ""}${Math.round(val)}dB`, pad.l - 4, y + 2);
+        ctx.fillText(
+          `${val > 0 ? "+" : ""}${Math.round(val)}dB`,
+          pad.l - 4,
+          y + 2,
+        );
       });
 
       // Draw frequency vertical grid lines
@@ -231,7 +246,12 @@ export const FilterVisualizer = ({
       ctx.setLineDash([]);
 
       // Draw response curve
-      const coeffs = biquadCoeffs(filterType, Math.max(cutoff, 1), Math.max(resonance, 0.001), 0);
+      const coeffs = biquadCoeffs(
+        filterType,
+        Math.max(cutoff, 1),
+        Math.max(resonance, 0.001),
+        0,
+      );
       ctx.beginPath();
       ctx.strokeStyle = cachedAccentColor;
       ctx.lineWidth = 2;
@@ -251,7 +271,11 @@ export const FilterVisualizer = ({
     const observer = new MutationObserver(() => {
       cachedBgColor = resolveCSSVar("--piano-bg-tertiary", "#111", canvas);
       cachedAccentColor = resolveCSSVar("--piano-accent", "#3b82f6", canvas);
-      cachedBorderColor = resolveCSSVar("--piano-border-strong", "#27272a", canvas);
+      cachedBorderColor = resolveCSSVar(
+        "--piano-border-strong",
+        "#27272a",
+        canvas,
+      );
       cachedTextColor = resolveCSSVar("--piano-text-muted", "#a1a1aa", canvas);
       draw();
     });

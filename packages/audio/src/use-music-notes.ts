@@ -6,12 +6,7 @@ import {
   useRef,
   useCallback,
 } from "react";
-import {
-  Pitches,
-  pitchToFrequency,
-  MAX_OCTAVE,
-  PITCH_CLASSES,
-} from "@react-piano-keyboard/music";
+import { Pitches, pitchToFrequency } from "@react-piano-keyboard/music";
 import {
   DEFAULT_OSCILLATOR_CONFIG,
   DEFAULT_OSCILLATOR_COUNT,

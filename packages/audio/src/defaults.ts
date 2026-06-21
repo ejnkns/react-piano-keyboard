@@ -13,8 +13,11 @@ export namespace Waveforms {
   export type Oscillator = (typeof OSCILLATORS)[number];
 }
 
-export const isOscillatorType = (value: unknown): value is Waveforms.Oscillator =>
-  typeof value === "string" && OSCILLATORS.includes(value as Waveforms.Oscillator);
+export const isOscillatorType = (
+  value: unknown,
+): value is Waveforms.Oscillator =>
+  typeof value === "string" &&
+  OSCILLATORS.includes(value as Waveforms.Oscillator);
 
 export type OscillatorConfig = {
   waveform: Waveforms.Oscillator;

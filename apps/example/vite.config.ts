@@ -42,24 +42,38 @@ export default defineConfig({
         ),
       },
       {
-        find: /^react-piano-keyboard\/hooks$/,
+        find: /^react-piano-keyboard\/piano$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/react-piano-keyboard/src/hooks.ts",
+          "../../packages/react-piano-keyboard/src/piano.tsx",
         ),
       },
       {
-        find: /^react-piano-keyboard\/components$/,
+        find: /^react-piano-keyboard\/piano-keyboard$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/react-piano-keyboard/src/components.ts",
+          "../../packages/react-piano-keyboard/src/piano-keyboard.ts",
         ),
       },
       {
-        find: /^react-piano-keyboard\/types$/,
+        find: /^react-piano-keyboard\/controls\/primitives$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/react-piano-keyboard/src/types.ts",
+          "../../packages/react-piano-keyboard/src/control-primitives.ts",
+        ),
+      },
+      {
+        find: /^react-piano-keyboard\/controls$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/react-piano-keyboard/src/controls.ts",
+        ),
+      },
+      {
+        find: /^react-piano-keyboard\/visualizers$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/react-piano-keyboard/src/visualizers.ts",
         ),
       },
       {
@@ -101,7 +115,7 @@ export default defineConfig({
         find: /^@react-piano-keyboard\/music$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/music/src/index.ts",
+          "../../packages/music/src/music.ts",
         ),
       },
       {
@@ -122,26 +136,40 @@ export default defineConfig({
         find: /^@react-piano-keyboard\/audio$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/audio/src/index.ts",
+          "../../packages/audio/src/audio.ts",
         ),
       },
       {
         find: /^@react-piano-keyboard\/piano-keyboard$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/piano-keyboard/src/index.ts",
+          "../../packages/piano-keyboard/src/piano-keyboard.tsx",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/controls\/visualizers$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/controls/src/visualizers.ts",
+        ),
+      },
+      {
+        find: /^@react-piano-keyboard\/controls\/primitives$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/controls/src/primitives.ts",
         ),
       },
       {
         find: /^@react-piano-keyboard\/controls$/,
         replacement: path.resolve(
           __dirname,
-          "../../packages/controls/src/index.ts",
+          "../../packages/controls/src/controls.tsx",
         ),
       },
     ],
   },
   css: {
-    postcss: './postcss.config.js',
+    postcss: "./postcss.config.js",
   },
 });

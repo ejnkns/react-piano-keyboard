@@ -20,7 +20,9 @@ export function ensureAnalogClip(
   const input = ctx.createGain();
   input.gain.value = inputVal;
   const shaper = ctx.createWaveShaper();
-  shaper.curve = createAnalogClipCurve(drive) as unknown as Float32Array<ArrayBuffer>;
+  shaper.curve = createAnalogClipCurve(
+    drive,
+  ) as unknown as Float32Array<ArrayBuffer>;
   shaper.oversample = ANALOG_CLIP_OVERSAMPLE;
   input.connect(shaper);
   shaper.connect(ctx.destination);
@@ -33,7 +35,9 @@ export function ensureAnalogClip(
 
 export function updateAnalogClipDrive(ref: AnalogClipRef, drive: number) {
   if (!ref.current) return;
-  ref.current.shaper.curve = createAnalogClipCurve(drive) as unknown as Float32Array<ArrayBuffer>;
+  ref.current.shaper.curve = createAnalogClipCurve(
+    drive,
+  ) as unknown as Float32Array<ArrayBuffer>;
 }
 
 export function updateAnalogClipInput(ref: AnalogClipRef, input: number) {
@@ -41,12 +45,19 @@ export function updateAnalogClipInput(ref: AnalogClipRef, input: number) {
   ref.current.input.gain.value = input;
 }
 
-export function updateAnalogClipEnabled(ref: AnalogClipRef, enabled: boolean, drive: number) {
+export function updateAnalogClipEnabled(
+  ref: AnalogClipRef,
+  enabled: boolean,
+  drive: number,
+) {
   if (!ref.current) return;
   if (enabled) {
-    ref.current.shaper.curve = createAnalogClipCurve(drive) as unknown as Float32Array<ArrayBuffer>;
+    ref.current.shaper.curve = createAnalogClipCurve(
+      drive,
+    ) as unknown as Float32Array<ArrayBuffer>;
   } else {
-    ref.current.shaper.curve = IDENTITY_CURVE as unknown as Float32Array<ArrayBuffer>;
+    ref.current.shaper.curve =
+      IDENTITY_CURVE as unknown as Float32Array<ArrayBuffer>;
   }
 }
 

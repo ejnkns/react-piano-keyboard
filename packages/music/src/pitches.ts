@@ -21,7 +21,8 @@ export namespace Pitches {
 }
 
 export const isPitchClass = (input: unknown): input is Pitches.PitchClass =>
-  typeof input === "string" && PITCH_CLASSES.includes(input as Pitches.PitchClass);
+  typeof input === "string" &&
+  PITCH_CLASSES.includes(input as Pitches.PitchClass);
 
 export const isPitch = (input: unknown): input is Pitches.Pitch => {
   if (typeof input !== "string") return false;
@@ -36,7 +37,9 @@ const sliceNote = (pitch: Pitches.Pitch) => {
   return { pitchClass, octave };
 };
 
-export const getPitchClass = (pitch: Pitches.Pitch | Pitches.PitchClass): Pitches.PitchClass => {
+export const getPitchClass = (
+  pitch: Pitches.Pitch | Pitches.PitchClass,
+): Pitches.PitchClass => {
   return isPitch(pitch) ? sliceNote(pitch).pitchClass : pitch;
 };
 
@@ -47,14 +50,20 @@ const getOctave = (pitch: Pitches.PitchClass | Pitches.Pitch) => {
   return DEFAULT_OCTAVE;
 };
 
-const makePitchData = (pitch: Pitches.PitchClass | Pitches.Pitch, octave?: number, cents?: number) =>
+const makePitchData = (
+  pitch: Pitches.PitchClass | Pitches.Pitch,
+  octave?: number,
+  cents?: number,
+) =>
   ({
     pitchClass: getPitchClass(pitch),
     octave: octave || getOctave(pitch),
     cents: cents || 0,
-  } satisfies Pitches.PitchData);
+  }) satisfies Pitches.PitchData;
 
-export const pitchToFrequency = (pitch: Pitches.PitchData | Pitches.PitchClass | Pitches.Pitch) => {
+export const pitchToFrequency = (
+  pitch: Pitches.PitchData | Pitches.PitchClass | Pitches.Pitch,
+) => {
   const pitchData = typeof pitch === "string" ? makePitchData(pitch) : pitch;
   const { pitchClass, octave, cents } = pitchData;
 
@@ -93,7 +102,10 @@ export const indexToPitch = (index: number) => {
   return isPitch(pitch) ? pitch : undefined;
 };
 
-export const getPitchRange = ({ start, end }: Pitches.GetPitchRangeInput): Pitches.Pitch[] => {
+export const getPitchRange = ({
+  start,
+  end,
+}: Pitches.GetPitchRangeInput): Pitches.Pitch[] => {
   const startIndex = pitchToIndex(start);
   const endIndex = pitchToIndex(end);
   const pitches: Pitches.Pitch[] = [];

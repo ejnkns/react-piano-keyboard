@@ -3,9 +3,9 @@ import {
   isOscillatorType,
   type OscillatorConfig,
 } from "@react-piano-keyboard/audio/defaults";
-import { Slider } from "./shared/slider";
-import { WavePicker } from "./shared/wave-picker";
-import type { PickerOption } from "./shared/picker";
+import { Slider } from "../slider";
+import { WavePicker } from "../wave-picker";
+import type { PickerOption } from "../picker";
 import type { SetFn } from "../controls-types";
 
 export type OscillatorHandlers = {

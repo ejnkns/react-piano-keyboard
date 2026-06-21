@@ -1,12 +1,20 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { Pitches } from "@react-piano-keyboard/music";
-import { getKeyToNoteMap } from "@react-piano-keyboard/piano-keyboard";
+import { getKeyToNoteMap } from "./keyboard-mapping";
 
-export const useKeyMapping = (notes: Pitches.Pitch[], initialMap?: Record<string, Pitches.Pitch>) => {
-  const defaultMap = useMemo(() => initialMap ?? getKeyToNoteMap(notes), [notes, initialMap]);
-  const [customMap, setCustomMap] = useState<Record<string, Pitches.Pitch>>(() => ({
-    ...defaultMap,
-  }));
+export const useKeyMapping = (
+  notes: Pitches.Pitch[],
+  initialMap?: Record<string, Pitches.Pitch>,
+) => {
+  const defaultMap = useMemo(
+    () => initialMap ?? getKeyToNoteMap(notes),
+    [notes, initialMap],
+  );
+  const [customMap, setCustomMap] = useState<Record<string, Pitches.Pitch>>(
+    () => ({
+      ...defaultMap,
+    }),
+  );
   const [editMode, setEditMode] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Pitches.Pitch | null>(null);
   const [conflictNote, setConflictNote] = useState<Pitches.Pitch | null>(null);
@@ -41,7 +49,7 @@ export const useKeyMapping = (notes: Pitches.Pitch[], initialMap?: Record<string
       });
       setConflictNote(null);
     },
-    [selectedNote]
+    [selectedNote],
   );
 
   const resetToDefaults = useCallback(() => {

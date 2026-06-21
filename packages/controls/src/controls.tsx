@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { PresetPicker } from "./controls/preset-picker";
-import { Toggle } from "./controls/shared/toggle";
+import "./controls.css";
+import { PresetPicker } from "./preset-picker";
+import { Toggle } from "./toggle";
 import {
   getOscillatorSection,
   getOscillatorHandlers,
@@ -104,7 +105,7 @@ const CONTROL_SECTION = [
 
 export type ControlSection = (typeof CONTROL_SECTION)[number];
 
-export type SectionSize = "full" | "half";
+type SectionSize = "full" | "half";
 
 function getControls({
   set,
@@ -162,3 +163,7 @@ function getControls({
     ],
   };
 }
+
+export { PresetPicker } from "./preset-picker";
+export type { SetFn } from "./controls-types";
+export * from "./visualizers";

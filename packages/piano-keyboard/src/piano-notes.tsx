@@ -1,5 +1,5 @@
 import { Pitches } from "@react-piano-keyboard/music";
-import { useMouseAndTouchDown } from "./notes/use-mouse-down";
+import { useMouseAndTouchDown } from "./piano-notes/use-mouse-and-touch-down";
 
 type AudioProps = {
   start: (note: Pitches.Pitch) => void;
@@ -65,8 +65,10 @@ export const PianoNotes = ({
         ? "piano-white flex-1 relative z-[1] h-[16em] border-l border-b rounded-b-[5px]"
         : "piano-black absolute z-[2] h-[8em] border rounded-b-[3px] top-0",
       playing && (isWhite ? "piano-white-playing" : "piano-black-playing"),
-      isSelected && "outline-[3px] outline-piano-keyboard-accent outline-offset-[-1px]",
-      isConflict && `outline-[3px] outline-red-500 outline-offset-[-1px] ${isWhite ? "bg-piano-keyboard-conflict-white" : "bg-piano-keyboard-conflict-black"}`,
+      isSelected &&
+        "outline-[3px] outline-piano-keyboard-accent outline-offset-[-1px]",
+      isConflict &&
+        `outline-[3px] outline-red-500 outline-offset-[-1px] ${isWhite ? "bg-piano-keyboard-conflict-white" : "bg-piano-keyboard-conflict-black"}`,
     ];
 
     return classes.filter(Boolean).join(" ");
@@ -91,7 +93,11 @@ export const PianoNotes = ({
         key={`${id}-${note}`}
         id={note}
         className={getClassNames(note)}
-        style={!isWhite ? { left: blackKeyPositions.get(note), width: `${blackKeyWidth}%` } : undefined}
+        style={
+          !isWhite
+            ? { left: blackKeyPositions.get(note), width: `${blackKeyWidth}%` }
+            : undefined
+        }
         onMouseDown={() => handleMouseDown(note)}
         onMouseOver={() =>
           !mapping.editMode && !!isMouseDown && audio.start(note)
@@ -110,8 +116,12 @@ export const PianoNotes = ({
               key={k}
               className="text-[9px] font-mono rounded px-[2px] leading-[14px]"
               style={{
-                background: isWhite ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.08)",
-                border: isWhite ? "1px solid rgba(0,0,0,0.15)" : "1px solid rgba(255,255,255,0.15)",
+                background: isWhite
+                  ? "rgba(0,0,0,0.06)"
+                  : "rgba(255,255,255,0.08)",
+                border: isWhite
+                  ? "1px solid rgba(0,0,0,0.15)"
+                  : "1px solid rgba(255,255,255,0.15)",
                 color: isWhite ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)",
               }}
             >
@@ -127,7 +137,10 @@ export const PianoNotes = ({
   };
 
   return (
-    <div ref={ref} className="piano-set relative flex rounded-[5px] shadow-piano-keyboard-case w-full">
+    <div
+      ref={ref}
+      className="piano-set relative flex rounded-[5px] shadow-piano-keyboard-case w-full"
+    >
       {notes.map((n) => renderNote(n))}
     </div>
   );

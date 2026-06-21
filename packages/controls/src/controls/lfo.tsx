@@ -5,10 +5,10 @@ import {
   isLfoTarget,
   type LfoTarget,
 } from "@react-piano-keyboard/audio/defaults";
-import { Slider } from "./shared/slider";
-import { WavePicker } from "./shared/wave-picker";
-import { Picker, type PickerOption } from "./shared/picker";
-import { LfoVisualizer } from "./lfo/lfo-visualizer";
+import { Slider } from "../slider";
+import { WavePicker } from "../wave-picker";
+import { Picker, type PickerOption } from "../picker";
+import { LfoVisualizer } from "../lfo-visualizer";
 import type { SetFn } from "../controls-types";
 
 export type LfoHandlers = {
@@ -49,7 +49,12 @@ function LfoGroup({
   defaultValues,
   handlers,
 }: {
-  defaultValues?: { lfoRate?: number; lfoDepth?: number; lfoTarget?: string; lfoWaveform?: string };
+  defaultValues?: {
+    lfoRate?: number;
+    lfoDepth?: number;
+    lfoTarget?: string;
+    lfoWaveform?: string;
+  };
   handlers: LfoHandlers;
 }) {
   const [lfoWave, setLfoWave] = useState<string>(() =>
@@ -137,7 +142,13 @@ export function getLfoSection({
   defaultValues,
   handlers,
 }: {
-  defaultValues?: { lfoRate?: number; lfoDepth?: number; lfoTarget?: string; lfoWaveform?: string; lfoEnabled?: boolean };
+  defaultValues?: {
+    lfoRate?: number;
+    lfoDepth?: number;
+    lfoTarget?: string;
+    lfoWaveform?: string;
+    lfoEnabled?: boolean;
+  };
   handlers: LfoHandlers;
 }) {
   return {

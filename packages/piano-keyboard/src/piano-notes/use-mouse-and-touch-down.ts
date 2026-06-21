@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useRef, useState } from "react";
 
 export const useMouseAndTouchDown = <T extends HTMLElement>(
-  ref?: RefObject<T>
+  ref?: RefObject<T>,
 ) => {
   const refUseRef = useRef<T>(null);
   const refToUse = ref ?? refUseRef;

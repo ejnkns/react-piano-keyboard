@@ -1,26 +1,26 @@
 {
   "name": "react-piano-keyboard",
   "version": "0.1.0",
-  "description": "A React piano keyboard component",
+  "description": "A batteries-included React piano and composable Web Audio toolkit",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/react-piano-keyboard.d.ts",
   "exports": {
     ".": {
       "types": "./dist/react-piano-keyboard.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     },
-    "./hooks": {
-      "types": "./dist/hooks.d.ts",
-      "import": "./dist/hooks.mjs",
-      "require": "./dist/hooks.cjs"
+    "./piano": {
+      "types": "./dist/piano.d.ts",
+      "import": "./dist/piano.mjs",
+      "require": "./dist/piano.cjs"
     },
-    "./components": {
-      "types": "./dist/components.d.ts",
-      "import": "./dist/components.mjs",
-      "require": "./dist/components.cjs"
+    "./piano-keyboard": {
+      "types": "./dist/piano-keyboard.d.ts",
+      "import": "./dist/piano-keyboard.mjs",
+      "require": "./dist/piano-keyboard.cjs"
     },
     "./music": {
       "types": "./dist/music.d.ts",
@@ -42,16 +42,30 @@
       "import": "./dist/audio-presets.mjs",
       "require": "./dist/audio-presets.cjs"
     },
-    "./types": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/types.mjs",
-      "require": "./dist/types.cjs"
+    "./controls": {
+      "types": "./dist/controls.d.ts",
+      "import": "./dist/controls.mjs",
+      "require": "./dist/controls.cjs"
+    },
+    "./controls/primitives": {
+      "types": "./dist/control-primitives.d.ts",
+      "import": "./dist/control-primitives.mjs",
+      "require": "./dist/control-primitives.cjs"
+    },
+    "./visualizers": {
+      "types": "./dist/visualizers.d.ts",
+      "import": "./dist/visualizers.mjs",
+      "require": "./dist/visualizers.cjs"
     },
     "./styles.css": "./dist/react-piano-keyboard.css"
   },
   "files": [
     "dist",
-    "src"
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "**/*.css"
   ],
   "scripts": {
     "dev": "vite build --watch",
@@ -61,10 +75,10 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@react-piano-keyboard/audio": "*",
-    "@react-piano-keyboard/controls": "*",
-    "@react-piano-keyboard/music": "*",
-    "@react-piano-keyboard/piano-keyboard": "*"
+    "@react-piano-keyboard/audio": "^0.1.0",
+    "@react-piano-keyboard/controls": "^0.1.0",
+    "@react-piano-keyboard/music": "^0.1.0",
+    "@react-piano-keyboard/piano-keyboard": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
@@ -94,6 +108,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ejnkns/react-piano-keyboard"
+    "url": "https://github.com/ejnkns/react-piano-keyboard.git",
+    "directory": "packages/react-piano-keyboard"
+  },
+  "homepage": "https://github.com/ejnkns/react-piano-keyboard#readme",
+  "bugs": "https://github.com/ejnkns/react-piano-keyboard/issues",
+  "publishConfig": {
+    "access": "public"
   }
 }

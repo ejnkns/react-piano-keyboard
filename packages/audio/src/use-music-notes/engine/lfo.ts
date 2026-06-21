@@ -25,7 +25,11 @@ export function ensureLfo(
 }
 
 export function getTargetParamsForVoice(
-  voice: { oscillators: { osc: OscillatorNode }[]; filterNode: BiquadFilterNode; tremoloGain: GainNode },
+  voice: {
+    oscillators: { osc: OscillatorNode }[];
+    filterNode: BiquadFilterNode;
+    tremoloGain: GainNode;
+  },
   target: LfoTarget,
 ): AudioParam[] {
   const params: AudioParam[] = [];
@@ -47,7 +51,11 @@ export function relinkLfo(
   ref: LfoRef,
   connRef: LfoConnectionsRef,
   target: LfoTarget,
-  voices: { oscillators: { osc: OscillatorNode }[]; filterNode: BiquadFilterNode; tremoloGain: GainNode }[],
+  voices: {
+    oscillators: { osc: OscillatorNode }[];
+    filterNode: BiquadFilterNode;
+    tremoloGain: GainNode;
+  }[],
 ) {
   const lfo = ref.current;
   if (!lfo) return;
@@ -72,7 +80,11 @@ export function relinkLfo(
 export function connectLfoToVoice(
   ref: LfoRef,
   connRef: LfoConnectionsRef,
-  voice: { oscillators: { osc: OscillatorNode }[]; filterNode: BiquadFilterNode; tremoloGain: GainNode },
+  voice: {
+    oscillators: { osc: OscillatorNode }[];
+    filterNode: BiquadFilterNode;
+    tremoloGain: GainNode;
+  },
   target: LfoTarget,
 ) {
   const lfo = ref.current;
@@ -90,7 +102,11 @@ export function connectLfoToVoice(
 export function disconnectLfoFromVoice(
   ref: LfoRef,
   connRef: LfoConnectionsRef,
-  voice: { oscillators: { osc: OscillatorNode }[]; filterNode: BiquadFilterNode; tremoloGain: GainNode },
+  voice: {
+    oscillators: { osc: OscillatorNode }[];
+    filterNode: BiquadFilterNode;
+    tremoloGain: GainNode;
+  },
 ) {
   const lfo = ref.current;
   if (!lfo) return;

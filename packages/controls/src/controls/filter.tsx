@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { isFilterType } from "@react-piano-keyboard/audio/defaults";
-import { Slider } from "./shared/slider";
-import { Picker, type PickerOption } from "./shared/picker";
-import { FilterVisualizer } from "./filter/filter-visualizer";
+import { Slider } from "../slider";
+import { Picker, type PickerOption } from "../picker";
+import { FilterVisualizer } from "../filter-visualizer";
 import type { SetFn } from "../controls-types";
 
 export type FilterHandlers = {

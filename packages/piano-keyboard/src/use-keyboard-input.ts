@@ -1,14 +1,8 @@
 import { useEffect } from "react";
-import { Pitches, isPitch } from "@react-piano-keyboard/music";
-
-type UseKeyboardInputOptions = {
-  start: (note: Pitches.Pitch) => void;
-  stop: (note: Pitches.Pitch) => void;
-  activeMap: Record<string, Pitches.Pitch>;
-  editMode?: boolean;
-  onAssignKey?: (key: string) => void;
-  enabled?: boolean;
-};
+import {
+  useKeyboardHandlers,
+  type KeyboardBindingOptions,
+} from "./use-keyboard-handlers";
 
 export const useKeyboardInput = ({
   start,
@@ -17,37 +11,24 @@ export const useKeyboardInput = ({
   editMode,
   onAssignKey,
   enabled = true,
-}: UseKeyboardInputOptions) => {
-  useEffect(() => {
-    if (!editMode || !onAssignKey) return;
-    const handler = (e: globalThis.KeyboardEvent) => {
-      if (e.repeat) return;
-      onAssignKey(e.key);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [editMode, onAssignKey]);
+}: KeyboardBindingOptions) => {
+  const { onKeyDown, onKeyUp } = useKeyboardHandlers({
+    start,
+    stop,
+    activeMap,
+    editMode,
+    onAssignKey,
+    enabled,
+  });
 
   useEffect(() => {
-    if (!enabled || editMode) return;
-    const down = (e: globalThis.KeyboardEvent) => {
-      if (e.repeat) return;
-      const note = activeMap[e.key];
-      if (isPitch(note)) {
-        start(note);
-      }
-    };
-    const up = (e: globalThis.KeyboardEvent) => {
-      const note = activeMap[e.key];
-      if (isPitch(note)) {
-        stop(note);
-      }
-    };
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
+    if (!enabled && !editMode) return;
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
     return () => {
-      window.removeEventListener("keydown", down);
-      window.removeEventListener("keyup", up);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
     };
-  }, [enabled, editMode, activeMap, start, stop]);
+  }, [onKeyDown, onKeyUp]);
 };
